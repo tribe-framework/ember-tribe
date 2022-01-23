@@ -2,7 +2,7 @@
 
 ## Installation
 
-* `git clone <repository-url>`
+* `git clone https://github.com/wil-ldf-ire/ember-tribe`
 * `cd ember-tribe`
 * `npm install`
 
