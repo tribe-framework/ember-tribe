@@ -1,17 +1,7 @@
 {{page-title "<%= classifiedPackageName %>"}}
 
 <Header />
-
-<main>
-	<h1 class="my-5 text-uppercase text-center">
-		<%= classifiedPackageName %>
-	</h1>
-
-	<h1 class="my-5 text-uppercase text-center">
-		{{@model.schema.webapp.headmeta_title}}
-	</h1>
-</main>
-
+<main><h1 class="my-5 text-uppercase text-center"><%= classifiedPackageName %></h1><h1 class="my-5 text-uppercase text-center">{{@model.schema.webapp.headmeta_title}}</h1></main>
 <Footer />
 
 {{outlet}}
