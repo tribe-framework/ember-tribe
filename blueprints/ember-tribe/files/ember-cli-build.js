@@ -22,10 +22,12 @@ module.exports = function (defaults) {
 
   app.import('public/assets/fontawesome/all.css');
   app.import('node_modules/plyr/dist/plyr.css');
+  app.import('node_modules/swiper/swiper-bundle.css');
   app.import('public/assets/css/custom.css');
 
   app.import('node_modules/plyr/dist/plyr.polyfilled.min.js');
   app.import('node_modules/bootstrap/dist/js/bootstrap.bundle.min.js');
+  app.import('node_modules/swiper/swiper-bundle.min.js');
   app.import('public/assets/js/custom.js');
 
   return app.toTree();

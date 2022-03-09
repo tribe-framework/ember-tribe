@@ -10,6 +10,7 @@ module.exports = {
       return this.addPackagesToProject([
         { name: 'bootstrap' },
         { name: 'plyr' },
+        { name: 'swiper' },
       ]);
     });
   },
