@@ -5,12 +5,10 @@ module.exports = {
 
   afterInstall() {
     return this.addAddonsToProject({
-      packages: [{ name: 'ember-cli-sass' }, { name: 'ember-cli-favicon' }],
+      packages: [{ name: 'ember-cli-sass' }, { name: 'ember-cli-favicon' }, { name: '@ember/optional-features' }],
     }).then(() => {
       return this.addPackagesToProject([
         { name: 'bootstrap' },
-        { name: 'plyr' },
-        { name: 'swiper' },
       ]);
     });
   },
