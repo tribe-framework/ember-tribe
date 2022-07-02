@@ -1,6 +1,6 @@
 {
   "name": "ember-tribe",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "The default blueprint for using Tribe API within EmberJS.",
   "keywords": [
     "ember-addon"

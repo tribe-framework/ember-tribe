@@ -8,7 +8,6 @@ In config/environment.js of your ember installation:
 ```
     //Wildfire Tribe config for EmberJS
     TribeENV: {
-      WEB_URL: 'https://xyx.com',
       API_URL: 'https://xyz.com/api',
     },
 ```
