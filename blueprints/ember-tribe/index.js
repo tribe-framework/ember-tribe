@@ -5,7 +5,7 @@ module.exports = {
 
   afterInstall() {
     return this.addAddonsToProject({
-      packages: [{ name: 'ember-cli-sass' }, { name: 'ember-cli-favicon' }, { name: '@ember/optional-features' }],
+      packages: [{ name: 'ember-cli-sass' }, { name: 'ember-cli-favicon' }, { name: '@ember/optional-features' }, { name: '@ember/render-modifiers' }, { name: 'ember-modifier' }],
     }).then(() => {
       return this.addPackagesToProject([
         { name: 'bootstrap' },
