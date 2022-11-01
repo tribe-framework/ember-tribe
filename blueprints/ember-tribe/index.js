@@ -11,7 +11,7 @@ module.exports = {
       { name: '@ember/optional-features' }, 
       { name: '@ember/render-modifiers' }, 
       { name: 'ember-modifier' }, 
-      { name: 'ember-modifier' }, 
+      { name: 'ember-prop-modifier' }, 
       { name: 'ember-composable-helpers' }, 
       { name: 'ember-truth-helpers' }, 
       { name: 'ember-math-helpers' }, 
