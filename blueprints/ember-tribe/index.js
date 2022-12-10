@@ -15,7 +15,8 @@ module.exports = {
       { name: 'ember-composable-helpers' }, 
       { name: 'ember-truth-helpers' }, 
       { name: 'ember-math-helpers' }, 
-      { name: 'ember-cli-string-helpers' }, ],
+      { name: 'ember-cli-string-helpers' }, 
+      { name: 'ember-animated' }, ],
     }).then(() => {
       return this.addPackagesToProject([
         { name: 'bootstrap' },
