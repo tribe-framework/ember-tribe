@@ -16,8 +16,7 @@ module.exports = {
       { name: 'ember-truth-helpers' }, 
       { name: 'ember-math-helpers' }, 
       { name: 'ember-cli-string-helpers' }, 
-      { name: 'ember-promise-helpers' }, 
-      { name: 'ember-tag-input' }, 
+      { name: 'ember-power-select' }, 
       { name: 'ember-flatpickr' }, 
       { name: 'ember-file-upload' }, 
       { name: 'ember-toggle' }, 
@@ -27,12 +26,15 @@ module.exports = {
     }).then(() => {
       return this.addPackagesToProject([
         { name: 'bootstrap' },
+        { name: 'animate.css' },
+        { name: 'video.js' },
+        { name: 'swiper' },
         { name: '@fortawesome/pro-solid-svg-icons' },
         { name: '@fortawesome/pro-regular-svg-icons' },
         { name: '@fortawesome/pro-light-svg-icons' },
         { name: '@fortawesome/pro-duotone-svg-icons' },
         { name: '@fortawesome/pro-thin-svg-icons' },
-        { name: '@fortawesome/free-brands-svg-icons'},
+        { name: '@fortawesome/free-brands-svg-icons' },
       ]);
     });
   },
