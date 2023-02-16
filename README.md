@@ -2,13 +2,13 @@ ember-tribe
 ==============================================================================
 
 An addon that connects EmberJS to Tribe API.
-Tribe is a project management framework by Wildfire - https://github.com/wil-ldf-ire/tribe
+Tribe is a project management framework by Wildfire - https://github.com/tribe-framework/tribe
 
 In config/environment.js of your ember installation:
 ```
     //Wildfire Tribe config for EmberJS
     TribeENV: {
-      API_URL: 'https://xyz.com/api',
+      BASE_URL: 'https://xyz.com',
     },
 ```
 
