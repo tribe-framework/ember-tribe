@@ -6,6 +6,7 @@ module.exports = {
   afterInstall() {
     return this.addAddonsToProject({
       packages: [
+      { name: 'ember-cli-dotenv' }, 
       { name: 'ember-cli-sass' }, 
       { name: 'ember-cli-favicon' }, 
       { name: '@ember/optional-features' }, 
