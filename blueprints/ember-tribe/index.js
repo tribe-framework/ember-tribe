@@ -31,6 +31,7 @@ module.exports = {
         { name: 'animate.css' },
         { name: 'video.js' },
         { name: 'swiper' },
+        { name: 'howler' },
         { name: '@fortawesome/pro-solid-svg-icons' },
         { name: '@fortawesome/pro-regular-svg-icons' },
         { name: '@fortawesome/pro-light-svg-icons' },
