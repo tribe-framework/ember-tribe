@@ -24,6 +24,7 @@ module.exports = {
       { name: 'ember-toggle' }, 
       { name: 'ember-content-editable' },
       { name: '@fortawesome/ember-fontawesome' }, 
+      { name: 'ember-power-select' },
       { name: 'ember-animated' }, ],
     }).then(() => {
       return this.addPackagesToProject([
