@@ -7,7 +7,7 @@ $commands = "mkdir app/models; ";
 
 foreach (array_keys($types) as $type) {
 
-	if (in_array($type, ($types['webapp']['interface_urls'][basename(dirname(__FILE__))]['types'] ?? array_keys($types)))) {
+	if ($type == 'webapp' || in_array($type, ($types['webapp']['interface_urls'][basename(dirname(__FILE__))]['types'] ?? array_keys($types)))) {
 
 		$type_hyphen = str_replace('_', '-', $type);
 		$type_ucwords = str_replace(' ', '', ucwords(str_replace('_', ' ', $type)));
