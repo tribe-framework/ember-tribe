@@ -11,7 +11,7 @@ foreach (array_keys($types) as $type) {
 
 		$type_hyphen = str_replace('_', '-', $type);
 		$type_ucwords = str_replace(' ', '', ucwords(str_replace('_', ' ', $type)));
-		$commands .= "echo \"import Model, { attr } from '@ember-data/model'; export default class ".$type_ucwords."Model extends Model { @attr modules; }\" > app/models/".$type_hyphen.".js; ";
+		$commands .= "echo \"import Model, { attr } from '@ember-data/model'; export default class ".$type_ucwords."Model extends Model { @attr slug; @attr modules; }\" > app/models/".$type_hyphen.".js; ";
 		
 	}
 }
