@@ -27,6 +27,7 @@ module.exports = {
       { name: 'ember-power-select' },
       { name: 'ember-click-outside' },
       { name: 'ember-web-app' },
+      { name: 'tracked-built-ins' },
       { name: 'ember-animated' }, ],
     }).then(() => {
       return this.addPackagesToProject([
