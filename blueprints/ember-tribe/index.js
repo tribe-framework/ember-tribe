@@ -33,6 +33,7 @@ module.exports = {
     }).then(() => {
       return this.addPackagesToProject([
         { name: 'bootstrap' },
+        { name: '@popperjs/core' },
         { name: 'animate.css' },
         { name: 'video.js' },
         { name: 'swiper' },
