@@ -39,6 +39,7 @@ module.exports = {
         { name: 'swiper' },
         { name: 'howler' },
         { name: 'peerjs' },
+        { name: 'ripplet.js' },
         { name: '@fortawesome/free-solid-svg-icons' },
         { name: '@fortawesome/free-brands-svg-icons' },
         { name: '@fortawesome/pro-solid-svg-icons' },
