@@ -27,7 +27,15 @@ ember install ember-tribe
 ```
 php sync-types.php
 ```
-
+4. To serve front-end webapp from backend server and for using page-wise meta tags
+- On local:
+```
+php sync-dist.php
+```
+- On server:
+```
+bash -c "$(wget --no-cache --no-cookie https://raw.githubusercontent.com/tribe-framework/tribe/master/install/ember.sh -O -)"
+```
 
 Usage
 ------------------------------------------------------------------------------
