@@ -8,9 +8,8 @@ Tribe is a project management framework by Postcode - https://github.com/tribe-f
 Compatibility
 ------------------------------------------------------------------------------
 
-* Ember.js v3.24 or above
-* Ember CLI v3.24 or above
-* Node.js v12 or above
+* Ember.js v5.4 or above
+* Ember CLI v5.4 or above
 
 
 Installation
