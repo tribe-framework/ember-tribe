@@ -28,6 +28,7 @@ module.exports = {
       { name: 'tracked-built-ins' },
       { name: 'ember-keyboard' },
       { name: 'ember-router-scroll' },
+      { name: 'ember-table' },
       { name: 'ember-animated' }, ],
     }).then(() => {
       return this.addPackagesToProject([
