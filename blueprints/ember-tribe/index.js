@@ -22,6 +22,7 @@ module.exports = {
       { name: 'ember-file-upload' }, 
       { name: 'ember-toggle' },
       { name: '@fortawesome/ember-fontawesome' }, 
+      { name: 'ember-basic-dropdown' }, 
       { name: 'ember-power-select' },
       { name: 'ember-click-outside' },
       { name: 'ember-web-app' },
