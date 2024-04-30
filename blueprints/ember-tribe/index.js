@@ -21,7 +21,6 @@ module.exports = {
       { name: 'ember-flatpickr' }, 
       { name: 'ember-file-upload' }, 
       { name: 'ember-toggle' },
-      { name: '@fortawesome/ember-fontawesome' }, 
       { name: 'ember-basic-dropdown' }, 
       { name: 'ember-power-select' },
       { name: 'ember-click-outside' },
@@ -39,15 +38,7 @@ module.exports = {
         { name: 'video.js' },
         { name: 'swiper' },
         { name: 'howler' },
-        { name: 'peerjs' },
         { name: 'ripplet.js' },
-        { name: '@fortawesome/free-solid-svg-icons' },
-        { name: '@fortawesome/free-brands-svg-icons' },
-        { name: '@fortawesome/pro-solid-svg-icons' },
-        { name: '@fortawesome/pro-regular-svg-icons' },
-        { name: '@fortawesome/pro-light-svg-icons' },
-        { name: '@fortawesome/pro-duotone-svg-icons' },
-        { name: '@fortawesome/pro-thin-svg-icons' },
       ]);
     });
   },
