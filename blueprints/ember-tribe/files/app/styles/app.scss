@@ -1,4 +1,24 @@
+$enable-rounded: false !default;
+$enable-negative-margins:     true !default;
+$enable-cssgrid:              true !default;
+
+$spacer: 1rem !default;
+$spacers: (
+  0: 0,
+  1: $spacer * .25,
+  2: $spacer * .5,
+  3: $spacer,
+  4: $spacer * 1.5,
+  5: $spacer * 3,
+  6: $spacer * 4.5,
+  7: $spacer * 6,
+  8: $spacer * 7.5,
+  9: $spacer * 9,
+  10: $spacer * 12,
+) !default;
+
 @import "node_modules/bootstrap/scss/bootstrap";
+@import "node_modules/animate.css/animate";
 
 .flame-bg {
 	background: linear-gradient(0deg, rgba(153,51,153,1) 0%, rgba(255,51,153,1) 100%);
