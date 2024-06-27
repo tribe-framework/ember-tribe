@@ -1,5 +1,6 @@
 <?php
-$types = json_decode(file_get_contents('../../config/types.json'), true);
+$_ENV = parse_ini_file('.env');
+$types = json_decode(file_get_contents($_ENV['TRIBE_API_URL'].'/api.php/webapp/0'), true)['data']['attributes']['modules'];
 
 // re-create models folder
 $commands = "[[ app/models ]] && rm -r app/models && mkdir app/models; ";
