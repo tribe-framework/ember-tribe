@@ -3,7 +3,7 @@ $_ENV = parse_ini_file('.env');
 if (($_ENV['TRIBE_API_URL'] ?? false) && $_ENV['TRIBE_API_URL'] != '') {
     $types = json_decode(file_get_contents($_ENV['TRIBE_API_URL'].'/api.php/webapp/0'), true)['data']['attributes']['modules'];
 } else {
-    $types = json_decode(file_get_contents('https://raw.githubusercontent.com/tribe-framework/types.json/master/blueprints/init.json'), true);
+    $types = json_decode(file_get_contents('https://raw.githubusercontent.com/tribe-framework/types.json/master/blueprints/junction-init.json'), true);
 }
 
 // re-create models folder
