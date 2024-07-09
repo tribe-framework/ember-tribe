@@ -1,6 +1,10 @@
 <?php
 $_ENV = parse_ini_file('.env');
-$types = json_decode(file_get_contents($_ENV['TRIBE_API_URL'].'/api.php/webapp/0'), true)['data']['attributes']['modules'];
+if (($_ENV['TRIBE_API_URL'] ?? false) && $_ENV['TRIBE_API_URL'] != '') {
+    $types = json_decode(file_get_contents($_ENV['TRIBE_API_URL'].'/api.php/webapp/0'), true)['data']['attributes']['modules'];
+} else {
+    $types = json_decode(file_get_contents('https://raw.githubusercontent.com/tribe-framework/types.json/master/blueprints/init.json'), true);
+}
 
 // re-create models folder
 $commands = "[[ app/models ]] && rm -r app/models && mkdir app/models; ";
@@ -17,3 +21,4 @@ foreach (array_keys($types) as $type) {
 }
 
 exec($commands);
+?>
