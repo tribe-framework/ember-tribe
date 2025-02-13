@@ -10,7 +10,6 @@ module.exports = {
       { name: 'ember-cli-sass' }, 
       { name: 'ember-cli-favicon' }, 
       { name: '@ember/optional-features' }, 
-      { name: '@ember/render-modifiers' }, 
       { name: 'ember-modifier' }, 
       { name: 'ember-composable-helpers' }, 
       { name: 'ember-truth-helpers' }, 
