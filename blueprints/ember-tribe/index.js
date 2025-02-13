@@ -16,6 +16,8 @@ module.exports = {
       { name: 'ember-math-helpers' }, 
       { name: 'ember-cli-string-helpers' }, 
       { name: 'ember-promise-helpers' }, 
+      { name: '@ember/string' }, 
+      { name: '@ember/test-waiters', target: '^3.1.0' },
       { name: 'ember-tag-input' }, 
       { name: 'ember-file-upload' }, 
       { name: 'ember-toggle' },
