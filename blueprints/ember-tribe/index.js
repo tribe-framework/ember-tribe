@@ -17,7 +17,6 @@ module.exports = {
       { name: 'ember-cli-string-helpers' }, 
       { name: 'ember-promise-helpers' }, 
       { name: 'ember-tag-input' }, 
-      { name: 'ember-flatpickr' }, 
       { name: 'ember-file-upload' }, 
       { name: 'ember-toggle' },
       { name: 'ember-basic-dropdown' }, 
