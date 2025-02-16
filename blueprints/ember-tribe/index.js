@@ -38,6 +38,7 @@ module.exports = {
         { name: 'swiper' },
         { name: 'howler' },
         { name: 'ripplet.js' },
+        { name: '@ember/string' },
       ]);
     });
   },
