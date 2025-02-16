@@ -26,6 +26,7 @@ module.exports = {
       { name: 'ember-web-app' },
       { name: 'tracked-built-ins' },
       { name: 'ember-keyboard' },
+      { name: '@ember/string' },
       { name: 'ember-router-scroll' },
       { name: 'ember-table' },
       { name: 'ember-animated' }, ],
@@ -38,7 +39,6 @@ module.exports = {
         { name: 'swiper' },
         { name: 'howler' },
         { name: 'ripplet.js' },
-        { name: '@ember/string' },
       ]);
     });
   },

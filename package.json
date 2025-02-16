@@ -1,6 +1,6 @@
 {
   "name": "ember-tribe",
-  "version": "2.4.4",
+  "version": "2.4.5",
   "description": "The default blueprint for using Tribe within EmberJS.",
   "keywords": [
     "ember-addon"
@@ -38,7 +38,7 @@
     "babel-eslint": "^10.1.0",
     "broccoli-asset-rev": "^3.0.0",
     "ember-auto-import": "^2.2.4",
-    "ember-cli": "^5.4.0",
+    "ember-cli": "^6.0.0",
     "ember-cli-dependency-checker": "^3.2.0",
     "ember-cli-inject-live-reload": "^2.1.0",
     "ember-cli-sri": "^2.1.1",
