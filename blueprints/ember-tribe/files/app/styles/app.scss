@@ -1,16 +1,16 @@
-/* STYLE GUIDE */
-//$font-family-sans-serif: "Helvetica Neue", sans-serif !default;
-//$display-font-family: "Helvetica Neue", sans-serif !default;
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
 
-//$primary:       #0000ff !default;
-//$secondary:     #cccccc !default;
-//$success:       #00ff00 !default;
-//$info:          #00ffff !default;
-//$warning:       #ffff00 !default;
-//$danger:        #ff0000 !default;
-//$light:         #eeeeee !default;
-//$dark:          $333333 !default;
-/* /STYLE GUIDE */
+$font-family-sans-serif: "IBM Plex Mono", serif !default;
+$display-font-family: "IBM Plex Mono", serif !default;
+
+$primary:       #000000 !default;
+$secondary:     #cccccc !default;
+$success:       #00ff00 !default;
+$info:          #0000ff !default;
+$warning:       #ffff00 !default;
+$danger:        #ff0000 !default;
+$light:         #eeeeee !default;
+$dark:          #333333 !default;
 
 $enable-rounded: false !default;
 $enable-negative-margins:     true !default;
@@ -36,8 +36,8 @@ $spacers: (
 
 .flame-bg {
 	background: linear-gradient(0deg, rgba(153,51,153,1) 0%, rgba(255,51,153,1) 100%);
-  	background-color: rgba(0, 0, 0, 0);
-  	background-position-x: 0%;
+	background-color: rgba(0, 0, 0, 0);
+	background-position-x: 0%;
 	background-position-y: 0%;
 	background-repeat: repeat;
 	background-attachment: scroll;
