@@ -26,7 +26,7 @@ ember install ember-tribe
 
 ## Overview
 
-Ember-tribe is a powerful Ember.js addon that bridges the gap between backend CMS data structures and frontend application development. It helps you make an Ember app from storylang.json, navigator.json and simplified-types.json files.
+Ember-tribe is a powerful Ember.js addon that bridges the gap between backend CMS data structures and frontend application development. It helps you make an Ember app from storylang.json and simplified-types.json files.
 
 ## Purpose
 
@@ -110,7 +110,7 @@ installer.sh
 
 ## Required File Outputs
 
-Ember-tribe generates separate, complete code files for each category:
+Make separate, complete code files for each category:
 
 ### installer.sh
 
@@ -273,7 +273,7 @@ Based on storylang.json component definitions:
 ### Component Structure
 
 ```javascript
-// Generated component class
+// Component class
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
@@ -315,7 +315,7 @@ export default class FileCardComponent extends Component {
 
 ### Custom Services
 
-Generated based on storylang.json service definitions:
+Make services based on storylang.json service definitions:
 
 ```javascript
 // app/services/visualization-builder.js
@@ -335,12 +335,11 @@ export default class VisualizationBuilderService extends Service {
 
 ## Route Generation
 
-### Automatic Route Creation
+### Route Creation
 
-Routes are generated based on storylang.json route definitions:
+Make routes based on storylang.json route definitions:
 
 ```javascript
-// Generated route
 import Route from '@ember/routing/route';
 import { service } from '@ember/service';
 
@@ -365,7 +364,7 @@ export default class FilesRoute extends Route {
 
 ### Global Helpers
 
-Auto-generated based on storylang.json helper requirements:
+Make helpers based on storylang.json helper requirements:
 
 ```javascript
 // app/helpers/format-date.js
@@ -390,7 +389,7 @@ export default helper(function formatDate([date, format = 'short']) {
 
 ### DOM Interaction Modifiers
 
-Generated for specific DOM manipulation needs:
+Make modifiers for specific DOM manipulation needs:
 
 ```javascript
 // app/modifiers/tooltip.js
@@ -440,12 +439,12 @@ this.store
 	.query('person', {
 		modules: { name: 'Peter', location: 'delhi' }, //results with AND
 		/*
-  filter: { name: 'Peter', location: 'delhi' } //results with OR
-  sort: "location,-age,name", //minus for descending order of that field, default is -id
-  page: { offset:0, limit:-1 }, //for pagination or smart uses, -1 means everything
-  ignore_ids: [10,14] //excludes these IDs from results
-  show_public_objects_only: false, //default = true, if set false results include content_privacy = drafts, private or pending
-  */
+	  filter: { name: 'Peter', location: 'delhi' } //results with OR
+	  sort: "location,-age,name", //minus for descending order of that field, default is -id
+	  page: { offset:0, limit:-1 }, //for pagination or smart uses, -1 means everything
+	  ignore_ids: [10,14] //excludes these IDs from results
+	  show_public_objects_only: false, //default = true, if set false results include content_privacy = drafts, private or pending
+  	*/
 	})
 	.then((results) => {
 		// Process results
@@ -697,7 +696,7 @@ async uploadFile(file) {
 ### Installation Commands
 
 ```bash
-# Generated installer.sh commands
+# Write all installer.sh commands
 ember g route files
 ember g controller files
 ember g component file-card -gc
