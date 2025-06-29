@@ -1,6 +1,6 @@
 {
   "name": "ember-tribe",
-  "version": "2.4.9",
+  "version": "2.4.10",
   "description": "The default blueprint for using Tribe and Junction within EmberJS.",
   "keywords": [
     "ember-addon"
