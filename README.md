@@ -26,7 +26,7 @@ ember install ember-tribe
 
 ## Overview
 
-Ember-tribe is a powerful Ember.js addon that bridges the gap between backend CMS data structures and frontend application development. It helps you make an Ember app from storylang.json and simplified-types.json files.
+ember-tribe is a powerful Ember.js addon that bridges the gap between backend CMS data structures and frontend application development. It helps you make an Ember app based on storylang.json and simplified-types.json files, if and when these files are availble.
 
 ## Purpose
 
