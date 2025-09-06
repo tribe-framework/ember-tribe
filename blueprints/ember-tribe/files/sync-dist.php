@@ -4,13 +4,13 @@ if (file_exists('dist/index.html') !== false) {
 	$html = file_get_contents('dist/index.html');
 
 	//replace head, before title
-	$html = str_replace('<title>', '<?php include_once("php/_head.php");?><title>', $html);
+	$html = str_replace('<title>', '<?php include_once("_head.php");?><title>', $html);
 
 	//replace head-footer, before </head> ends
-	$html = str_replace('</head>', '<?php include_once("php/_head_footer.php");?></head>', $html);
+	$html = str_replace('</head>', '<?php include_once("_head_footer.php");?></head>', $html);
 
 	//replace body-footer, before </body> ends
-	$html = str_replace('</body>', '<?php include_once("php/_body_footer.php");?></body>', $html);
+	$html = str_replace('</body>', '<?php include_once("_body_footer.php");?></body>', $html);
 
 	//load dom
 	$dom = new DOMDocument();
@@ -40,7 +40,7 @@ if (file_exists('dist/index.html') !== false) {
 	$html = $dom->saveHTML();
 
 	//prepend _init.php for $type and $slug and Tribe composer
-	$html = '<?php include_once("php/_init.php");?>'.$html;
+	$html = '<?php include_once("_init.php");?>'.$html;
 
 	//save to file
 	file_put_contents('dist/index.php', $html);
