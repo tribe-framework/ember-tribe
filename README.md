@@ -4,15 +4,11 @@ An addon that connects EmberJS to Tribe API, bridging the gap between backend da
 
 Tribe is a project management framework built for ease of collaboration - https://github.com/tribe-framework/tribe
 
-## Compatibility
-
-- Ember CLI v6.x (<= v6.4)
-
 ## Installation and Setup
 
 ### Prerequisites
 
-- Ember CLI v6.x (<= v6.4)
+- Ember CLI v6.0 – v6.4
 - Node.js (latest LTS)
 - Junction (optional) - via https://junction.express (cloud version) or https://tribe-framework.org (open source version)
 
@@ -22,15 +18,15 @@ Tribe is a project management framework built for ease of collaboration - https:
 ember install ember-tribe
 ```
 
-- Enter `TRIBE_API_URL` and `TRIBE_API_KEY` in `.env` file (copy of `.env.sample`)
+- Enter `TRIBE_API_URL` and `TRIBE_API_KEY` in `.env` file (copy of `.env.sample`). You can find these values in the Junction dashboard at [junction.express](https://junction.express) (cloud) or your self-hosted Tribe admin panel.
 
 ---
 
 The addon automatically configures following essential packages:
 
-**Ember Addons:**: `ember-cli-dotenv`, `ember-cli-sass`, `ember-modifier`, `ember-composable-helpers`, `ember-truth-helpers`, `ember-file-upload` , `ember-power-select`
+**Ember Addons:** `ember-cli-dotenv`, `ember-cli-sass`, `ember-modifier`, `ember-composable-helpers`, `ember-truth-helpers`, `ember-file-upload` , `ember-power-select`
 
-**NPM Packages:**:  `bootstrap`, `@popperjs/core`, `animate.css`, `video.js`, `swiper`,  `howler`
+**NPM Packages:** `bootstrap`, `@popperjs/core`, `animate.css`, `video.js`, `swiper`,  `howler`
 
 ---
 
@@ -64,6 +60,14 @@ ember-tribe ships with a command-line tool called `storylang` that synchronises 
 storylang <command> [options]
 ```
 
+**Commands:**
+
+| Command | Description |
+|---|---|
+| `storylang pull` | Updates `config/storylang.json` from current project files |
+| `storylang push` | Generates any missing routes, components, services, helpers, modifiers, and controllers |
+| `storylang push -o` | Regenerates all artefacts in `storylang.json`, overwriting existing files |
+
 **Example:**
 
 ```bash
@@ -81,25 +85,25 @@ storylang push -o
 
 ### Typical Workflow
 
-1. Use AI to generate the ember-tribe codebase.
+1. Define your `config/storylang.json` spec (manually or with the help of an AI tool), then run `storylang push` to generate the project files.
 2. Run `storylang pull` periodically to keep the spec in sync as the project evolves.
 
 ---
 
-# Storylang.json Documentation
+## Storylang.json Documentation
 
-## Overview
+### Overview
 
 Storylang.json is a structured configuration file used in the ember-tribe ecosystem to define the frontend implementation of your application. It is found at `config/storylang.json`. It works in conjunction with your `types.json` (which defines your data types) to create a complete frontend specification.
 
-## Purpose
+### Purpose
 
 The storylang.json file serves as a blueprint for frontend developers to understand:
 
 - What routes, components, services, helpers, modifiers and types are required
 - How data flows through the application
 
-## File Structure
+### File Structure
 
 The storylang.json file contains seven main sections:
 
@@ -115,7 +119,7 @@ The storylang.json file contains seven main sections:
 }
 ```
 
-## Section Definitions
+### Section Definitions
 
 ### 1. Implementation Approach
 
@@ -389,9 +393,9 @@ The storylang.json file contains seven main sections:
 
 ---
 
-## Data Types Reference
+### Data Types Reference
 
-### Data Types  (dataType)
+### Data Types (dataType)
 
 - `string`: Text values
 - `int`: Integer numbers
@@ -408,7 +412,7 @@ The storylang.json file contains seven main sections:
 
 ---
 
-## Integration with Other Files
+### Integration with Other Files
 
 ### With types.json
 
@@ -418,7 +422,7 @@ The storylang.json file contains seven main sections:
 
 ---
 
-## Storylang Best Practices
+### Storylang Best Practices
 
 **Always begin your thought process with routes → then move repeatable template logic into components → then move repeatable app-wide logic from components and routes to services → then extract reusable template and component functions into helpers → then extract template and component DOM behaviour into modifiers**
 
@@ -437,9 +441,9 @@ The storylang.json file contains seven main sections:
 
 ---
 
-# Ember-Tribe Development Guide
+## Ember-Tribe Development Guide
 
-## Required File Outputs
+### Required File Outputs
 
 Make separate, complete code files for each category:
 
@@ -464,8 +468,8 @@ Following is the default style that comes with tribe. Use the app.scss file for 
 ```app/styles/app.scss
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
 
-$font-family-sans-serif: 'IBM Plex Mono', serif !default;
-$display-font-family: 'IBM Plex Mono', serif !default;
+$font-family-sans-serif: 'IBM Plex Mono', monospace !default;
+$display-font-family: 'IBM Plex Mono', monospace !default;
 
 $primary: #000000 !default;
 $secondary: #cccccc !default;
@@ -482,24 +486,24 @@ $enable-cssgrid: true !default;
 
 $spacer: 1rem !default;
 $spacers: (
-	0: 0,
-	1: $spacer * 0.25,
-	2: $spacer * 0.5,
-	3: $spacer,
-	4: $spacer * 1.5,
-	5: $spacer * 3,
-	6: $spacer * 4.5,
-	7: $spacer * 6,
-	8: $spacer * 7.5,
-	9: $spacer * 9,
-	10: $spacer * 12,
+  0: 0,
+  1: $spacer * 0.25,
+  2: $spacer * 0.5,
+  3: $spacer,
+  4: $spacer * 1.5,
+  5: $spacer * 3,
+  6: $spacer * 4.5,
+  7: $spacer * 6,
+  8: $spacer * 7.5,
+  9: $spacer * 9,
+  10: $spacer * 12,
 ) !default;
 
 @import 'node_modules/bootstrap/scss/bootstrap';
 @import 'node_modules/animate.css/animate';
 ```
 
-### Defauly application structure
+### Default application structure
 
 ```app/templates/application.hbs
 {{page-title 'Your Application Name'}}
@@ -559,11 +563,11 @@ console.log(post.modules.content_privacy); // Universal field
 ```javascript
 // Complex queries
 this.store.query('post', {
-	modules: { status: 'published' }, // AND conditions
-	filter: { category: 'tech' }, // OR conditions
-	sort: 'title,-created_date', // Sort (- for desc)
-	page: { offset: 0, limit: 10 }, // Pagination
-	show_public_objects_only: false, // Include drafts
+  modules: { status: 'published' }, // AND conditions
+  filter: { category: 'tech' }, // OR conditions
+  sort: 'title,-created_date', // Sort (- for desc)
+  page: { offset: 0, limit: 10 }, // Pagination
+  show_public_objects_only: false, // Include drafts
 });
 ```
 
@@ -636,13 +640,13 @@ import { action } from '@ember/object';
 import { service } from '@ember/service';
 
 export default class FileCardComponent extends Component {
-	@service store;
-	@tracked isSelected = false;
+  @service store;
+  @tracked isSelected = false;
 
-	@action
-	toggleSelection() {
-		this.isSelected = !this.isSelected;
-	}
+  @action
+  toggleSelection() {
+    this.isSelected = !this.isSelected;
+  }
 }
 ```
 
@@ -650,13 +654,13 @@ export default class FileCardComponent extends Component {
 
 ```handlebars
 <div
-	class='card {{if this.isSelected "border-primary"}}'
-	{{on 'click' this.toggleSelection}}
+  class='card {{if this.isSelected "border-primary"}}'
+  {{on 'click' this.toggleSelection}}
 >
-	<div class='card-body'>
-		<h5 class='card-title'>{{@file.modules.title}}</h5>
-		<p class='card-text'>{{@file.modules.description}}</p>
-	</div>
+  <div class='card-body'>
+    <h5 class='card-title'>{{@file.modules.title}}</h5>
+    <p class='card-text'>{{@file.modules.description}}</p>
+  </div>
 </div>
 ```
 
@@ -673,12 +677,12 @@ import { tracked } from '@glimmer/tracking';
 import { service } from '@ember/service';
 
 export default class VisualizationBuilderService extends Service {
-	@service store;
-	@tracked supportedTypes = ['network', 'tree', 'sankey'];
+  @service store;
+  @tracked supportedTypes = ['network', 'tree', 'sankey'];
 
-	buildVisualization(files, type, config) {
-		// Service logic implementation
-	}
+  buildVisualization(files, type, config) {
+    // Service logic implementation
+  }
 }
 ```
 
@@ -695,19 +699,19 @@ import Route from '@ember/routing/route';
 import { service } from '@ember/service';
 
 export default class FilesRoute extends Route {
-	@service store;
+  @service store;
 
-	queryParams = {
-		page: { refreshModel: true },
-		search: { refreshModel: true },
-	};
+  queryParams = {
+    page: { refreshModel: true },
+    search: { refreshModel: true },
+  };
 
-	async model(params) {
-		return await this.store.query('json_file', {
-			page: { offset: (params.page - 1) * 10, limit: 10 },
-			modules: params.search ? { title: params.search } : {},
-		});
-	}
+  async model(params) {
+    return await this.store.query('json_file', {
+      page: { offset: (params.page - 1) * 10, limit: 10 },
+      modules: params.search ? { title: params.search } : {},
+    });
+  }
 }
 ```
 
@@ -724,9 +728,9 @@ Make helpers based on storylang.json helper requirements:
 import { helper } from '@ember/component/helper';
 
 export default helper(function formatDate([date, format = 'short']) {
-	return new Intl.DateTimeFormat('en-US', {
-		dateStyle: format,
-	}).format(new Date(date));
+  return new Intl.DateTimeFormat('en-US', {
+    dateStyle: format,
+  }).format(new Date(date));
 });
 ```
 
@@ -734,7 +738,7 @@ export default helper(function formatDate([date, format = 'short']) {
 
 ```handlebars
 <span class='text-muted'>
-	{{format-date @post.modules.created_date 'medium'}}
+  {{format-date @post.modules.created_date 'medium'}}
 </span>
 ```
 
@@ -752,15 +756,15 @@ import { modifier } from 'ember-modifier';
 import { Tooltip } from 'bootstrap';
 
 export default modifier((element, [content]) => {
-	const tooltip = new bootstrap.Tooltip(element, {
-		title: content,
-	});
+  const tooltip = new Tooltip(element, {
+    title: content,
+  });
 
-	return () => tooltip.dispose();
+  return () => tooltip.dispose();
 });
 ```
 
-## Helpers
+## Writing Helpers
 
 Helper functions are JavaScript functions callable from Ember templates that perform computations or operations beyond basic template syntax, keeping templates clean while adding dynamic functionality.
 
@@ -773,8 +777,8 @@ Helper functions are JavaScript functions callable from Ember templates that per
 ```javascript
 // app/components/user-card.js
 export default class UserCard extends Component {
-	formatName = (firstName, lastName) =>
-		`${firstName} ${lastName}`.toUpperCase();
+  formatName = (firstName, lastName) =>
+    `${firstName} ${lastName}`.toUpperCase();
 }
 ```
 
@@ -823,8 +827,8 @@ Ember components should be thought of as templates that re-execute from scratch 
 
 ```handlebars
 <article title='{{@article.modules.title}}'>
-	<header><h1>{{@article.modules.title}}</h1></header>
-	<section>{{@article.modules.body}}</section>
+  <header><h1>{{@article.modules.title}}</h1></header>
+  <section>{{@article.modules.body}}</section>
 </article>
 ```
 
@@ -835,7 +839,7 @@ Ember components should be thought of as templates that re-execute from scratch 
 
 ```handlebars
 <div class={{if @user.modules.is_admin 'superuser' 'standard'}}>
-	Welcome to my app.
+  Welcome to my app.
 </div>
 ```
 
@@ -852,12 +856,12 @@ import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 
 export default class CounterComponent extends Component {
-	@tracked count = 0;
+  @tracked count = 0;
 
-	@action
-	increment() {
-		this.count++;
-	}
+  @action
+  increment() {
+    this.count++;
+  }
 }
 ```
 
@@ -892,11 +896,11 @@ play() {
 import { modifier } from 'ember-modifier';
 
 export default modifier((element, [isPlaying]) => {
-	if (isPlaying) {
-		element.play();
-	} else {
-		element.pause();
-	}
+  if (isPlaying) {
+    element.play();
+  } else {
+    element.pause();
+  }
 });
 ```
 
@@ -921,13 +925,13 @@ import { TrackedArray } from 'tracked-built-ins';
 import Service from '@ember/service';
 
 export default class ShoppingCartService extends Service {
-	items = new TrackedArray([]);
+  items = new TrackedArray([]);
 
-	add(item) { this.items.push(item) }
+  add(item) { this.items.push(item) }
 
-	remove(item) { this.items.splice(this.items.indexOf(item), 1) }
+  remove(item) { this.items.splice(this.items.indexOf(item), 1) }
 
-	empty() { this.items.splice(0, this.items.length) }
+  empty() { this.items.splice(0, this.items.length) }
 }
 ```
 
@@ -938,8 +942,8 @@ import Component from '@glimmer/component';
 import { service } from '@ember/service';
 
 export default class CartContentsComponent extends Component {
-	// Loads service from: app/services/shopping-cart.js
-	@service shoppingCart;
+  // Loads service from: app/services/shopping-cart.js
+  @service shoppingCart;
 }
 ```
 
