@@ -150,7 +150,7 @@ For each artefact discovered the command parses the source file and extracts:
 - **Controllers** — query-param definitions and actions are merged into the matching route entry.
 - **Components** — `tracked_vars`, `inherited_args` (from template `@arg` usage), `actions`, injected `services`, referenced `helpers` and `modifiers`, and the component `type` (inferred from template markup when possible).
 - **Services** — `tracked_vars`, `actions`, injected `services`, and referenced `helpers`.
-- **Helpers** — `name`, `description` (from JSDoc if present), `args`, and `returns` type.
+- **Helpers** — `name`, `description` (from JSDoc if present), `args`, and `return` type.
 - **Modifiers** — `name`, `description`, `args`, and injected `services`.
 - **Models / Types** — model names are listed in the `types` section with their `used_in` map populated from cross-references found in routes, components, and services.
 
@@ -534,7 +534,7 @@ The storylang.json file contains seven main sections:
       "name": "helper-name",
       "description": "What this helper does",
       "args": [{ "arg_name": "data_type" }],
-      "returns": "data_type"
+      "return": "data_type"
     }
   ]
 }
@@ -545,7 +545,7 @@ The storylang.json file contains seven main sections:
 - `name`: Kebab-case name of the helper
 - `description`: Brief description of what the helper computes or transforms
 - `args`: Input arguments the helper accepts
-- `returns`: The data type the helper outputs
+- `return`: The data type the helper outputs
 
 **Example**:
 
@@ -556,19 +556,19 @@ The storylang.json file contains seven main sections:
       "name": "format-date",
       "description": "Formats a raw ISO date string into a human-readable date",
       "args": [{ "isoString": "string" }, { "format": "string" }],
-      "returns": "string"
+      "return": "string"
     },
     {
       "name": "truncate-text",
       "description": "Truncates a string to a given character limit and appends an ellipsis",
       "args": [{ "text": "string" }, { "limit": "int" }],
-      "returns": "string"
+      "return": "string"
     },
     {
       "name": "pluralize",
       "description": "Returns singular or plural form of a word based on a count",
       "args": [{ "count": "int" }, { "word": "string" }],
-      "returns": "string"
+      "return": "string"
     }
   ]
 }
