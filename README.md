@@ -28,32 +28,13 @@ ember install ember-tribe
 
 The addon automatically configures following essential packages:
 
-**Ember Addons:**
+**Ember Addons:**: `ember-cli-dotenv`, `ember-cli-sass`, `ember-modifier`, `ember-composable-helpers`, `ember-truth-helpers`, `ember-file-upload` , `ember-power-select`
 
-- `ember-cli-dotenv` - Environment configuration
-- `ember-cli-sass` - SCSS support
-- `ember-modifier` - DOM manipulation helpers
-- `ember-composable-helpers` - Template utilities
-- `ember-truth-helpers` - Boolean logic helpers
-- `ember-file-upload` - File handling
-- `ember-power-select` - Advanced select components
-- `ember-table` - Data tables
-- `ember-animated` - Smooth animations
-
-**NPM Packages:**
-
-- `bootstrap` - UI framework
-- `@popperjs/core` - Bootstrap dependency
-- `animate.css` - CSS animations
-- `video.js` - Video player
-- `swiper` - Touch sliders
-- `howler` - Audio management
+**NPM Packages:**:  `bootstrap`, `@popperjs/core`, `animate.css`, `video.js`, `swiper`,  `howler`
 
 ---
 
-## Core Architecture
-
-### File Structure
+## Core File Structure
 
 ```
 app/
@@ -433,7 +414,6 @@ The storylang.json file contains seven main sections:
 
 - Type names used in routes should match type names from `types.json`
 - The `types` section in storylang.json is the explicit bridge between your data types and your UI — always keep it in sync with `types.json`
-- Component `inherited_args` often reference type data pulled from store, and/or their fields
 - Types are the gateway to persistent storage on the backend
 
 ---
@@ -455,17 +435,6 @@ The storylang.json file contains seven main sections:
 11. **Modifiers**: Use modifiers to isolate all direct DOM manipulation and third-party library initialisation from component logic
 12. **Types Mapping**: Populate the `types` section as you define your routes and components — it is your traceability layer between data types and UI
 
-## Tips for Manual Creation of storylang.json
-
-1. **Start with implementation_approach**: Write a clear use case first
-2. **Declare types early**: List the types from `simplified-types.json` you'll need before designing routes and components
-3. **Identify key user journeys**: Map these to routes
-4. **Break down UI into components**: Focus on reusability
-5. **Define data flow**: Ensure types align with your `simplified-types.json`
-6. **Plan service architecture**: Keep core application logic separate from UI logic
-7. **Extract helpers**: Any formatting or computation repeated across templates should become a named helper
-8. **Extract modifiers**: Any direct DOM interaction or third-party library setup should become a named modifier
-
 ---
 
 # Ember-Tribe Development Guide
@@ -474,20 +443,25 @@ The storylang.json file contains seven main sections:
 
 Make separate, complete code files for each category:
 
-### installer.sh
+### Example installer.sh
 
 ```bash
-ember g route <n>;
-ember g controller <n>;
-ember g component <n> -gc;
-ember g helper <n>;
-ember g modifier <n>;
-ember g service <n>;
+npm i chart.js
+npm i lodash
+ember install ember-table
+ember g route files
+ember g controller files
+ember g component file-card -gc
+ember g helper format-date
+ember g modifier tooltip
+ember g service visualization-builder
 ```
 
-### app/styles/app.scss
+### Default styling
 
-```scss
+Following is the default style that comes with tribe. Use the app.scss file for all style code. Change this based on your design styling requirements.
+
+```app/styles/app.scss
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
 
 $font-family-sans-serif: 'IBM Plex Mono', serif !default;
@@ -525,15 +499,36 @@ $spacers: (
 @import 'node_modules/animate.css/animate';
 ```
 
-### app/templates/application.hbs
+### Defauly application structure
 
-```handlebars
+```app/templates/application.hbs
 {{page-title 'Your Application Name'}}
 {{outlet}}
 <BasicDropdownWormhole />
 ```
 
-**Application.hbs Extension Guidelines:**
+```app/routes/application.js
+import Route from '@ember/routing/route';
+import * as bootstrap from 'bootstrap';
+import { service } from '@ember/service';
+import { later } from '@ember/runloop';
+import { action } from '@ember/object';
+
+export default class ApplicationRoute extends Route {
+  @service types;
+
+  //auto-sync backend types
+  async beforeModel() { await this.types.fetchAgain() }
+
+  @action
+  didTransition() { later( this, () => { document.querySelector('#loading').classList.add('d-none') }, 50 ) }
+
+  @action
+  willTransition() { document.querySelector('#loading').classList.remove('d-none') }
+}
+```
+
+**Application Extension Guidelines:**
 
 - Extend when adding global navigation components
 - Include shared modals or dropdowns
@@ -544,25 +539,11 @@ $spacers: (
 
 ## EmberData Integration
 
-### Automatic Model Generation
-
-Ember-tribe automatically generates models from backend track definitions through the `types` service:
-
-```javascript
-// app/routes/application.js
-export default class ApplicationRoute extends Route {
-	@service types;
-
-	async beforeModel() {
-		// Auto-generates models from backend
-		await this.types.fetchAgain();
-	}
-}
-```
+ember-tribe automatically generates models from backend track definitions through the `types` service:
 
 ### Data Access Patterns
 
-All backend data uses the `modules` key for field access:
+EmberData operations always use a "modules" key for field access, except for `.id` and `.slug` properties. All field names from backend storage use underscore notation: `modules.any_field`.
 
 ```javascript
 // Accessing track data
@@ -586,57 +567,64 @@ this.store.query('post', {
 });
 ```
 
----
+Smart use of EmberData can significantly reduce size of the codebase. Make sure you take advantage of that.
 
-## Styling System
+**Universal Default Module:**
+All objects include: `"content_privacy": "string | public, private, pending, draft"`
 
-### Default Configuration (app.scss)
+**Single Record Operations:**
 
-```scss
-// Typography
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono...');
-$font-family-sans-serif: 'IBM Plex Mono', serif !default;
+```javascript
+// Find by ID or slug
+this.store.findRecord('track', 30);
+this.store.findRecord('track', 'some-slug-here');
 
-// Color Palette
-$primary: #000000 !default;
-$secondary: #cccccc !default;
-$success: #00ff00 !default;
-// ... additional colors
+// Access without network request (if already in store)
+let post = this.store.peekRecord('post', 1);
 
-// Bootstrap Configuration
-$enable-rounded: false !default;
-$enable-negative-margins: true !default;
-$enable-cssgrid: true !default;
-
-@import 'node_modules/bootstrap/scss/bootstrap';
-@import 'node_modules/animate.css/animate';
+// Usage pattern
+this.store.findRecord('post', 1).then((post) => {
+  // Access: post.id, post.slug, post.modules.<field_name>
+});
 ```
 
-### Design Principles
+**Multiple Records:**
 
-- **Minimal Controllers**: Logic should reside in components and services
-- **Bootstrap 5.x Foundation**: Responsive, accessible design system
-- **Subtle Animations**: animate.css for enhanced user experience
-- **FontAwesome 6.x**: Comprehensive icon library
+```javascript
+this.store
+  .query('person', {
+    modules: { name: 'Peter', location: 'delhi' }, //results with AND
+    /*
+    filter: { name: 'Peter', location: 'delhi' } //results with OR
+    sort: "location,-age,name", //minus for descending order of that field, default is -id
+    page: { offset:0, limit:-1 }, //for pagination or smart uses, -1 means everything
+    ignore_ids: [10,14] //excludes these IDs from results
+    show_public_objects_only: false, //default = true, if set false results include content_privacy = drafts, private or pending
+    */
+  })
+  .then((results) => {
+    // Process results
+  });
+```
+
+Prefer using backend (this.store.query) for search, filter and sort, over front-end JS functions to achieve the same thing. Avoid using this.store.findAll altogether, use this.store.query with page: { offset:0, limit:-1 } instead.
+
+**CRUD Operations:**
+
+```javascript
+// Update
+let post = await this.store.findRecord('post', 1);
+post.modules.title = 'A new title';
+await post.save(); // => PATCH request
+
+// Delete
+let post = this.store.peekRecord('post', 2);
+post.destroyRecord(); // => DELETE request
+```
 
 ---
 
 ## Component Architecture
-
-### Component Types
-
-Based on storylang.json component definitions:
-
-**Layout Components:**
-
-- `table`, `figure`, `accordion`, `card`, `list-group`
-- `navbar`, `nav`, `tab`, `breadcrumb`
-
-**Interactive Components:**
-
-- `button`, `button-group`, `dropdown`, `modal`
-- `input-field`, `select`, `file-uploader`
-- `pagination`, `popover`, `tooltip`
 
 ### Component Structure
 
@@ -676,15 +664,6 @@ export default class FileCardComponent extends Component {
 
 ## Services Integration
 
-### Built-in Services
-
-- `store` - EmberData for CRUD operations
-- `router` - Navigation and route management
-- `types` - Automatic model generation
-- `bootstrap` - Bootstrap component initialization
-
-### Custom Services
-
 Make services based on storylang.json service definitions:
 
 ```javascript
@@ -723,8 +702,8 @@ export default class FilesRoute extends Route {
 		search: { refreshModel: true },
 	};
 
-	model(params) {
-		return this.store.query('json_file', {
+	async model(params) {
+		return await this.store.query('json_file', {
 			page: { offset: (params.page - 1) * 10, limit: 10 },
 			modules: params.search ? { title: params.search } : {},
 		});
@@ -781,70 +760,7 @@ export default modifier((element, [content]) => {
 });
 ```
 
----
-
-## Ember.js Reference Guide
-
-### EmberData Patterns
-
-Smart use of EmberData can significantly reduce size of the codebase. Make sure you take advantage of that.
-
-EmberData operations always use a "modules" key for field access, except for `.id` and `.slug` properties. All field names from backend storage use underscore notation: `modules.any_field`.
-
-**Universal Default Module:**
-All objects include: `"content_privacy": "string | public, private, pending, draft"`
-
-**Single Record Operations:**
-
-```javascript
-// Find by ID or slug
-this.store.findRecord('track', 30);
-this.store.findRecord('track', 'some-slug-here');
-
-// Access without network request (if already in store)
-let post = this.store.peekRecord('post', 1);
-
-// Usage pattern
-this.store.findRecord('post', 1).then((post) => {
-	// Access: post.id, post.slug, post.modules.<field_name>
-});
-```
-
-**Multiple Records:**
-
-```javascript
-this.store
-	.query('person', {
-		modules: { name: 'Peter', location: 'delhi' }, //results with AND
-		/*
-	  filter: { name: 'Peter', location: 'delhi' } //results with OR
-	  sort: "location,-age,name", //minus for descending order of that field, default is -id
-	  page: { offset:0, limit:-1 }, //for pagination or smart uses, -1 means everything
-	  ignore_ids: [10,14] //excludes these IDs from results
-	  show_public_objects_only: false, //default = true, if set false results include content_privacy = drafts, private or pending
-  	*/
-	})
-	.then((results) => {
-		// Process results
-	});
-```
-
-Prefer using backend (this.store.query) for search, filter and sort, over front-end JS functions to achieve the same thing. Avoid using this.store.findAll altogether, use this.store.query with page: { offset:0, limit:-1 } instead.
-
-**CRUD Operations:**
-
-```javascript
-// Update
-let post = await this.store.findRecord('post', 1);
-post.modules.title = 'A new title';
-await post.save(); // => PATCH request
-
-// Delete
-let post = this.store.peekRecord('post', 2);
-post.destroyRecord(); // => DELETE request
-```
-
-### Helpers
+## Helpers
 
 Helper functions are JavaScript functions callable from Ember templates that perform computations or operations beyond basic template syntax, keeping templates clean while adding dynamic functionality.
 
@@ -1007,17 +923,11 @@ import Service from '@ember/service';
 export default class ShoppingCartService extends Service {
 	items = new TrackedArray([]);
 
-	add(item) {
-		this.items.push(item);
-	}
+	add(item) { this.items.push(item) }
 
-	remove(item) {
-		this.items.splice(this.items.indexOf(item), 1);
-	}
+	remove(item) { this.items.splice(this.items.indexOf(item), 1) }
 
-	empty() {
-		this.items.splice(0, this.items.length);
-	}
+	empty() { this.items.splice(0, this.items.length) }
 }
 ```
 
@@ -1032,12 +942,6 @@ export default class CartContentsComponent extends Component {
 	@service shoppingCart;
 }
 ```
-
-**Usage Guidelines:**
-
-- Use for application-wide state management
-- Share functionality across multiple routes/components
-- Maintain data that survives route transitions
 
 ---
 
@@ -1073,121 +977,18 @@ async uploadFile(file) {
 }
 ```
 
-### Installation Commands
-
-```bash
-# Write all installer.sh commands
-ember g route files
-ember g controller files
-ember g component file-card -gc
-ember g helper format-date
-ember g modifier tooltip
-ember g service visualization-builder
-```
-
-### Pre-approval Process
-
-Before code generation, ember-tribe requests approval for additional packages:
-
-```bash
-# Example approval request
-npm i chart.js
-npm i lodash
-ember install ember-table
-```
-
----
-
-## Application Structure
-
-### Application Template
-
-```handlebars
-{{page-title 'Your Application Name'}}
-{{outlet}}
-<BasicDropdownWormhole />
-```
-
 ---
 
 ## Best Practices
 
-### Controller Minimization
-
-- Keep controllers minimal - prefer component logic
-- Use controllers only for query params and route-level actions
-- Move business logic to services
-
-### Animation Guidelines
-
-- Use animate.css for enhanced UX
-- Prefer subtle animations (fadeIn, slideIn)
-- Avoid overwhelming users with excessive animation
-
-### Data Flow
-
-1. **Routes**: Fetch and prepare data
-2. **Components**: Display and interact with data
-3. **Services**: Handle business logic and state
-4. **Helpers**: Transform data for display
-
-### Performance Considerations
-
-- Leverage EmberData caching with `peekRecord`
-- Use backend filtering over frontend array manipulation
-- Implement pagination for large datasets
-- Minimize controller file count
-
----
-
-## Integration Examples
-
-### With Junction CMS
-
-```javascript
-// Automatic sync with Junction tracks
-async beforeModel() {
-  await this.types.fetchAgain(); // Syncs with backend types
-}
-```
-
-### With External APIs
-
-```javascript
-// Service for external integrations
-@service externalApi;
-
-async model() {
-  const localData = await this.store.query('post', {});
-  const externalData = await this.externalApi.fetch('/posts');
-  return { local: localData, external: externalData };
-}
-```
-
----
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Model Not Found**: Ensure `types.fetchAgain()` completes in application route
-2. **Module Access**: Remember to use `modules.field_name` for backend fields
-3. **Bootstrap Components**: Initialize through modifier or service
-4. **Animation Conflicts**: Check animate.css class conflicts
-5. **npm packages vs ember addons**: Prioritize npm packages over ember addons for better compatibility, when both are offering similar functionality
-
-### Debug Commands
-
-```javascript
-// Check loaded models
-this.store.peekAll('your-model-name');
-
-// Verify service registration
-this.owner.lookup('service:your-service');
-
-// Route debugging
-console.log(this.router.currentRouteName);
-```
+1. **Module Access**: Remember to use `modules.field_name` for backend fields
+2. **npm packages vs ember addons**: Prioritize npm packages over ember addons for better compatibility, when both are offering similar functionality
+3. **Minimal Controllers**: Logic should ideally reside in components and services
+4. **Bootstrap 5.x Foundation**: Responsive, accessible design system
+5. **Use FontAwesome 6.x**: Comprehensive icon library
+6. **Animations**: If required, use animate.css for enhanced user experience. Prefer subtle animations (fadeIn, slideIn). Avoid overwhelming users with excessive animation
+7. **Access Cache**: Leverage EmberData caching with `peekRecord`
+8. **Avoid array manipulations of backend data**: Use backend filtering over frontend array manipulation
 
 ---
 
