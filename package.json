@@ -1,6 +1,6 @@
 {
   "name": "ember-tribe",
-  "version": "2.5.3",
+  "version": "2.6.0",
   "description": "The default blueprint for using Tribe API and Junction within EmberJS.",
   "keywords": [
     "ember-addon"
@@ -24,6 +24,9 @@
     "test": "npm-run-all lint test:*",
     "test:ember": "ember test",
     "test:ember-compatibility": "ember try:each"
+  },
+  "bin": {
+    "storylang": "bin/storylang"
   },
   "dependencies": {
     "ember-cli-babel": "^7.26.11",
