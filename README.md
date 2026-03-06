@@ -1,57 +1,30 @@
 # ember-tribe
 
-An addon that connects EmberJS to Tribe API.
-Tribe is a collaborative project management framework - https://github.com/tribe-framework/tribe
+An addon that connects EmberJS to Tribe API, bridging the gap between backend data structures and frontend application development. It helps you make an Ember app based on Junction's Blueprint file, also called `types.json`.
 
-https://junction.express provides an interface to build a Tribe compatible no-code backend in minutes.
+Tribe is a collaborative project management framework - https://github.com/tribe-framework/tribe
 
 ## Compatibility
 
-- Ember.js v6.0 or above
-- Ember CLI v6.0 or above
-
-## Installation
-
-1. Install
-
-```
-ember install ember-tribe
-```
-
-2. Configure
-
-- Enter TRIBE_API_URL and TRIBE_API_KEY in .env file, copy of .env.sample
-
----
-
-# Ember-Tribe Documentation
-
-## Overview
-
-ember-tribe is a powerful Ember.js addon that bridges the gap between backend CMS data structures and frontend application development. It helps you make an Ember app based on `storylang.json` and `simplified-types.json` files, if and when these files are available.
-
-## Purpose
-
-Ember-tribe enables rapid application development by:
-
-- Providing pre-configured addon ecosystem for common functionality
-- Implementing standardized patterns for Tribe applications
-- Creating responsive, Bootstrap-based interfaces with minimal configuration
-- Supporting automatic model generation from backend track definitions in simplified-types.json
+- Ember CLI v6.x (<= v6.4)
 
 ## Installation and Setup
 
 ### Prerequisites
 
-- Ember.js 6.x
+- Ember CLI v6.x (<= v6.4)
 - Node.js (latest LTS)
-- Junction backend
+- Junction (optional) - via https://junction.express (cloud version) or https://tribe-framework.org (open source version)
 
 ### Installation
 
 ```bash
 ember install ember-tribe
 ```
+
+- Enter `TRIBE_API_URL` and `TRIBE_API_KEY` in `.env` file (copy of `.env.sample`)
+
+---
 
 The addon automatically configures following essential packages:
 
@@ -80,22 +53,6 @@ The addon automatically configures following essential packages:
 
 ## Core Architecture
 
-### Think in this order
-
-ember-tribe follows a specific order that includes our learnings and Ember.js best practices, and must be followed exactly:
-
-1. **router.js** - Application routing structure
-2. **app/routes** - Route handlers and data loading
-3. **app/templates & controllers** - UI templates and minimal controllers
-4. **app/components** - Reusable UI components with component specific logic
-5. **app/services** - Application-wide logic and state
-
-This order ensures proper dependency resolution and optimal code organization.
-
-### Package Philosophy
-
-**Try using npm packages over ember addons because ember addons are sometimes outdated.** Ember-tribe prioritizes npm packages for better compatibility and maintenance.
-
 ### File Structure
 
 ```
@@ -118,7 +75,7 @@ installer.sh
 
 ## Storylang CLI
 
-ember-tribe ships with a command-line tool called `storylang` that synchronises the `config/storylang.json` specification with the actual Ember project files. It is installed automatically when you run `ember install ember-tribe`.
+ember-tribe ships with a command-line tool called `storylang` that synchronises the `config/storylang.json` specification with the actual Ember project files.
 
 ### Usage
 
@@ -126,76 +83,16 @@ ember-tribe ships with a command-line tool called `storylang` that synchronises 
 storylang <command> [options]
 ```
 
-### Commands
-
-#### `storylang pull`
-
-Reads the current Ember project and generates (or updates) `config/storylang.json` to reflect what already exists on disk.
-
-The command scans the following directories and maps every discovered artefact into the corresponding section of the storylang spec:
-
-| Ember directory      | Storylang section |
-| -------------------- | ----------------- |
-| `app/routes/`        | `routes`          |
-| `app/controllers/`   | `routes` (merged) |
-| `app/components/`    | `components`      |
-| `app/services/`      | `services`        |
-| `app/helpers/`       | `helpers`         |
-| `app/modifiers/`     | `modifiers`       |
-| `app/models/`        | `types`           |
-
-For each artefact discovered the command parses the source file and extracts:
-
-- **Routes** — `tracked_vars`, `get_vars` (query params), injected `services`, referenced `components`, `helpers`, `modifiers`, loaded `types`, and `actions`.
-- **Controllers** — query-param definitions and actions are merged into the matching route entry.
-- **Components** — `tracked_vars`, `inherited_args` (from template `@arg` usage), `actions`, injected `services`, referenced `helpers` and `modifiers`, and the component `type` (inferred from template markup when possible).
-- **Services** — `tracked_vars`, `actions`, injected `services`, and referenced `helpers`.
-- **Helpers** — `name`, `description` (from JSDoc if present), `args`, and `return` type.
-- **Modifiers** — `name`, `description`, `args`, and injected `services`.
-- **Models / Types** — model names are listed in the `types` section with their `used_in` map populated from cross-references found in routes, components, and services.
-
-The `implementation_approach` field is left unchanged if it already exists, or set to an empty string for manual completion.
-
 **Example:**
 
 ```bash
-cd my-ember-app
+cd /path/to/ember/app
+
 storylang pull
 # => config/storylang.json updated from project files
-```
 
-#### `storylang push`
-
-Reads `config/storylang.json` and generates any Ember artefacts that do not yet exist in the project. It effectively turns the storylang spec into real files via `ember generate`.
-
-The mapping works as follows:
-
-| Storylang section | Ember generate command                |
-| ----------------- | ------------------------------------- |
-| `routes`          | `ember g route <name>`                |
-| `routes`          | `ember g controller <name>`           |
-| `components`      | `ember g component <name> -gc`        |
-| `services`        | `ember g service <name>`              |
-| `helpers`         | `ember g helper <name>`               |
-| `modifiers`       | `ember g modifier <name>`             |
-| `types`           | *(models are auto-generated at runtime by the `types` service — no file generation needed; their presence in storylang.json is sufficient)* |
-
-By default, `storylang push` **will not overwrite** files that already exist on disk. Only artefacts missing from the project are created.
-
-**Overwrite flag:**
-
-```bash
-storylang push -o
-```
-
-When `-o` (or `--overwrite`) is set, existing files will be regenerated. Use with caution — this will replace any manual edits in the affected files.
-
-**Example:**
-
-```bash
-cd my-ember-app
 storylang push
-# => only missing routes, components, services, helpers, modifiers, and controllers are generated
+# => missing routes, components, services, helpers, modifiers, and controllers are generated
 
 storylang push -o
 # => all artefacts in storylang.json are (re)generated, overwriting existing files
@@ -203,25 +100,8 @@ storylang push -o
 
 ### Typical Workflow
 
-1. Design your frontend specification in `config/storylang.json` (or generate it from an existing project with `storylang pull`).
-2. Run `storylang push` to scaffold all the required files.
-3. Implement the application logic inside the generated files.
-4. Run `storylang pull` periodically to keep the spec in sync as the project evolves.
-
----
-
-# What is Storylang?
-
-Storylang is a language that can be used for storyboarding user experiences. It brings precision and clarity to the collaborative process for people involved in UX design and frontend development.
-
-Storylang is JSON-compatible.
-
-Long-term goal: Storylang must evolve into a written script notation framework that can help imagine, annotate and communicate.
-
-Inspiration to create this was drawn from music notations.
-
-![Storylang notations](https://wildfiretech.co/theme/assets/img/bach-notes.png)<br>
-<em>Above: Hand-written musical notation by J. S. Bach (1685–1750).</em>
+1. Use AI to generate the ember-tribe codebase.
+2. Run `storylang pull` periodically to keep the spec in sync as the project evolves.
 
 ---
 
@@ -229,7 +109,7 @@ Inspiration to create this was drawn from music notations.
 
 ## Overview
 
-Storylang.json is a structured configuration file used in the ember-tribe ecosystem to define the frontend implementation of your application. It lives inside the Ember project's `config/` folder at `config/storylang.json`. It works in conjunction with your `simplified-types.json` (which defines your data types) to create a complete frontend specification.
+Storylang.json is a structured configuration file used in the ember-tribe ecosystem to define the frontend implementation of your application. It is found at `config/storylang.json`. It works in conjunction with your `types.json` (which defines your data types) to create a complete frontend specification.
 
 ## Purpose
 
@@ -272,7 +152,7 @@ The storylang.json file contains seven main sections:
 
 ### 2. Types
 
-**Purpose**: Declares which data types from `simplified-types.json` are used in this application, and maps them to the components, routes, services, helpers and modifiers that consume them. This creates a traceable link between your data layer and your UI implementation.
+**Purpose**: Declares which data types from `types.json` and maps them to the components, routes, services, helpers and modifiers that consume them. This creates a traceable link between your data layer and your UI implementation.
 
 **Format**:
 
@@ -280,44 +160,13 @@ The storylang.json file contains seven main sections:
 {
   "types": [
     {
-      "name": "type-name",
-      "used_in": {
-        "components": ["component-name"],
+      "slug": "type-slug", //type slug as defined in `types.json` blueprint
+      "used_in": { //where this type is used
         "routes": ["route-name"],
-        "services": ["service-name"]
-      }
-    }
-  ]
-}
-```
-
-**Type Properties**:
-
-- `name`: The type name as defined in `simplified-types.json`
-- `used_in`: An object mapping the type to the parts of the app that reference it
-  - `components`: Components that receive or manipulate this type
-  - `routes`: Routes that load or use this type
-  - `services`: Services that operate on this type
-
-**Example**:
-
-```json
-{
-  "types": [
-    {
-      "name": "json_file",
-      "used_in": {
-        "components": ["file-summary-card", "file-list"],
-        "routes": ["files", "files.show"],
-        "services": ["file-manager"]
-      }
-    },
-    {
-      "name": "user",
-      "used_in": {
-        "components": ["profile-card"],
-        "routes": ["profile"],
-        "services": ["session"]
+        "components": ["component-name"],
+        "services": ["service-name"],
+        "helpers": ["helper-name"],
+        "modifiers": ["modifier-name"]
       }
     }
   ]
@@ -337,9 +186,9 @@ The storylang.json file contains seven main sections:
   "components": [
     {
       "name": "component-name",
-      "type": "component-type",
-      "tracked_vars": [{ "variable_name": "data_type" }],
-      "inherited_args": [{ "arg_name": "type" }],
+      "type": "component-type", //from the built-in components list
+      "tracked_vars": [{ "<variableName>": "<dataType>" }],
+      "inherited_args": [{ "<argumentName>": "<argType>" }],
       "actions": ["action1", "action2"],
       "helpers": ["helper1", "helper2"],
       "modifiers": ["modifier1"],
@@ -348,17 +197,6 @@ The storylang.json file contains seven main sections:
   ]
 }
 ```
-
-**Component Properties**:
-
-- `name`: Kebab-case name of the component
-- `type`: Type from the built-in components list
-- `tracked_vars`: State variables tracked within the component
-- `inherited_args`: Arguments passed from parent components
-- `actions`: User interactions the component handles
-- `helpers`: Template helpers used within the component
-- `modifiers`: DOM modifiers applied to elements
-- `services`: Ember services injected into the component
 
 **Built-in Component Types**:
 
@@ -376,8 +214,8 @@ The storylang.json file contains seven main sections:
       "tracked_vars": [{ "isSelected": "bool" }, { "isExpanded": "bool" }],
       "inherited_args": [
         { "file": "var" },
-        { "onEdit": "fn" },
-        { "onDelete": "fn" }
+        { "onEdit": "action" },
+        { "onDelete": "action" }
       ],
       "actions": ["toggleSelection", "expandDetails", "editFile", "deleteFile"],
       "helpers": ["formatDate", "truncateText"],
@@ -400,51 +238,14 @@ The storylang.json file contains seven main sections:
 {
   "routes": [
     {
-      "name": "route-name",
-      "tracked_vars": [{ "variable_name": "data_type" }],
-      "get_vars": [{ "param_name": "data_type" }],
+      "name": "route-name", //should match Ember router.js
+      "tracked_vars": [{ "<variableName>": "<dataType>" }],
+      "get_vars": [{ "<paramName>": "<dataType>" }],
       "actions": ["action1", "action2"],
       "helpers": ["helper1"],
       "services": ["service1"],
       "components": ["component1", "component2"],
       "types": ["type1", "type2"]
-    }
-  ]
-}
-```
-
-**Route Properties**:
-
-- `name`: The route name (matches Ember router)
-- `tracked_vars`: Route-level state variables
-- `get_vars`: URL query parameters and their types
-- `actions`: Route-level actions
-- `helpers`: Template helpers used in route templates
-- `services`: Services used by the route
-- `components`: Components rendered in this route
-- `types`: Data types loaded by this route
-
-**Example**:
-
-```json
-{
-  "routes": [
-    {
-      "name": "files",
-      "tracked_vars": [
-        { "selectedFileType": "string" },
-        { "sortOrder": "string" }
-      ],
-      "get_vars": [
-        { "page": "int" },
-        { "search": "string" },
-        { "filter": "string" }
-      ],
-      "actions": ["filterFiles", "sortFiles", "searchFiles"],
-      "helpers": ["pluralize", "formatDate"],
-      "services": ["store", "router"],
-      "components": ["file-list", "file-filter", "search-box", "pagination"],
-      "types": ["json_file"]
     }
   ]
 }
@@ -463,7 +264,7 @@ The storylang.json file contains seven main sections:
   "services": [
     {
       "name": "service-name",
-      "tracked_vars": [{ "variable_name": "data_type" }],
+      "tracked_vars": [{ "<variableName>": "<dataType>" }],
       "actions": ["action1", "action2"],
       "helpers": ["helper1"],
       "services": ["dependency1", "dependency2"]
@@ -472,23 +273,11 @@ The storylang.json file contains seven main sections:
 }
 ```
 
-**Service Properties**:
-
-- `name`: Service name
-- `tracked_vars`: Service-level tracked properties
-- `actions`: Methods provided by the service
-- `helpers`: Utility functions
-- `services`: Other services this service depends on
-
 **Built-in Services**:
 
 - `store`: Ember Data store for CRUD operations
 - `router`: Ember router service for navigation
 - `types`: Automatic model generation from backend tracks
-- `bootstrap`: Bootstrap component initialization
-
-**Third-party npm packages pre-installed**:
-
 - `bootstrap`: Bootstrap CSS framework with Popper.js
 - `papaparse`: CSV parsing library
 - `sortablejs`: Drag-and-drop sorting
@@ -533,8 +322,8 @@ The storylang.json file contains seven main sections:
     {
       "name": "helper-name",
       "description": "What this helper does",
-      "args": [{ "arg_name": "data_type" }],
-      "return": "data_type"
+      "args": [{ "<argumentName>": "<dataType>" }],
+      "return": "<dataType>"
     }
   ]
 }
@@ -563,12 +352,6 @@ The storylang.json file contains seven main sections:
       "description": "Truncates a string to a given character limit and appends an ellipsis",
       "args": [{ "text": "string" }, { "limit": "int" }],
       "return": "string"
-    },
-    {
-      "name": "pluralize",
-      "description": "Returns singular or plural form of a word based on a count",
-      "args": [{ "count": "int" }, { "word": "string" }],
-      "return": "string"
     }
   ]
 }
@@ -588,7 +371,7 @@ The storylang.json file contains seven main sections:
     {
       "name": "modifier-name",
       "description": "What DOM behaviour this modifier applies",
-      "args": [{ "arg_name": "data_type" }],
+      "args": [{ "<argumentName>": "<dataType>" }],
       "services": ["service1"]
     }
   ]
@@ -614,12 +397,6 @@ The storylang.json file contains seven main sections:
       "services": []
     },
     {
-      "name": "sortable-list",
-      "description": "Attaches SortableJS drag-and-drop behaviour to a list element",
-      "args": [{ "items": "array" }, { "onReorder": "fn" }],
-      "services": []
-    },
-    {
       "name": "autofocus",
       "description": "Sets focus on the target element when it is inserted into the DOM",
       "args": [],
@@ -633,30 +410,29 @@ The storylang.json file contains seven main sections:
 
 ## Data Types Reference
 
-### Common Data Types
+### Data Types  (dataType)
 
 - `string`: Text values
 - `int`: Integer numbers
 - `bool`: Boolean true/false
 - `array`: List of items
 - `object`: Complex data structure
-- `var`: Variable (any type)
-- `fn`: Function reference
 
-### Argument Types
+### Argument Types (argType)
 
 - `var`: Passed data/state
 - `fn`: Callback function
+- `get`: Get function
 - `action`: User interaction handler
 
 ---
 
 ## Integration with Other Files
 
-### With simplified-types.json
+### With types.json
 
-- Type names used in routes should match type names from `simplified-types.json`
-- The `types` section in storylang.json is the explicit bridge between your data types and your UI — always keep it in sync with `simplified-types.json`
+- Type names used in routes should match type names from `types.json`
+- The `types` section in storylang.json is the explicit bridge between your data types and your UI — always keep it in sync with `types.json`
 - Component `inherited_args` often reference type data pulled from store, and/or their fields
 - Types are the gateway to persistent storage on the backend
 
@@ -1398,6 +1174,7 @@ async model() {
 2. **Module Access**: Remember to use `modules.field_name` for backend fields
 3. **Bootstrap Components**: Initialize through modifier or service
 4. **Animation Conflicts**: Check animate.css class conflicts
+5. **npm packages vs ember addons**: Prioritize npm packages over ember addons for better compatibility, when both are offering similar functionality
 
 ### Debug Commands
 
