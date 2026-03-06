@@ -2,7 +2,7 @@
 
 An addon that connects EmberJS to Tribe API, bridging the gap between backend data structures and frontend application development. It helps you make an Ember app based on Junction's Blueprint file, also called `types.json`.
 
-Tribe is a collaborative project management framework - https://github.com/tribe-framework/tribe
+Tribe is a project management framework built for ease of collaboration - https://github.com/tribe-framework/tribe
 
 ## Compatibility
 
@@ -167,7 +167,7 @@ The storylang.json file contains seven main sections:
   "components": [
     {
       "name": "component-name",
-      "type": "component-type", //from the built-in components list
+      "type": "component-type",
       "tracked_vars": [{ "<variableName>": "<dataType>" }],
       "inherited_args": [{ "<argumentName>": "<argType>" }],
       "actions": ["action1", "action2"],
@@ -179,7 +179,7 @@ The storylang.json file contains seven main sections:
 }
 ```
 
-**Built-in Component Types**:
+**Built-in Component Types in ember-tribe**:
 
 - **Layout**: `table`, `figure`, `accordion`, `card`, `list-group`, `navbar`, `nav`, `tab`, `breadcrumb`
 - **Interactive**: `button`, `button-group`, `dropdown`, `modal`, `collapse`, `offcanvas`, `pagination`, `popover`, `tooltip`, `swiper-carousel`, `videojs-player`, `howlerjs-player`, `input-field`, `input-group`, `textarea`, `checkbox`, `radio`, `range`, `select`, `multi-select`, `date`, `file-uploader`, `alert`, `badge`, `toast`, `placeholder`, `progress`, `spinner`, `scrollspy`
@@ -254,7 +254,7 @@ The storylang.json file contains seven main sections:
 }
 ```
 
-**Built-in Services**:
+**Built-in Services in ember-tribe**:
 
 - `store`: Ember Data store for CRUD operations
 - `router`: Ember router service for navigation
@@ -425,7 +425,7 @@ The storylang.json file contains seven main sections:
 1. **Start with Routes**: Match route names to user mental models and use consistent naming conventions
 2. **Minimize Route Logic**: Preferably fetch (read) type data in routes and then pass that data to components or services. Other than fetching type data, minimize the use of javascript in routes — Javascript is meant to be in components and services more than in routes
 3. **Route Parameters**: Keep get_vars minimal and meaningful, and load only necessary types for each route
-4. **Component Focus**: Keep components focused on single responsibilities and use descriptive, kebab-case names
+4. **Component Focus**: Keep components focused on single responsibilities and use descriptive, kebab-case names. Names should indicate which built-in ember-tribe component to use.
 5. **Data Flow**: Receive backend data down from routes (via inherited_args) rather than fetching (reading) in components
 6. **Component Actions**: Non-read functions — create, update, delete — can all happen well at component-level
 7. **Service Integration**: Use services directly in both components and routes for app-wide logic
