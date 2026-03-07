@@ -57,36 +57,23 @@ ember-tribe ships with a command-line tool called `storylang` that synchronises 
 ### Usage
 
 ```bash
-storylang <command> [options]
+node storylang
 ```
 
-**Commands:**
-
-| Command | Description |
-|---|---|
-| `storylang pull` | Updates `config/storylang.json` from current project files |
-| `storylang push` | Generates any missing routes, components, services, helpers, modifiers, and controllers |
-| `storylang push -o` | Regenerates all artefacts in `storylang.json`, overwriting existing files |
+Scans the current Ember project and writes/updates `config/storylang.json` from the actual files that exist in the `app/` directory.
 
 **Example:**
 
 ```bash
 cd /path/to/ember/app
 
-storylang pull
+node storylang
 # => config/storylang.json updated from project files
-
-storylang push
-# => missing routes, components, services, helpers, modifiers, and controllers are generated
-
-storylang push -o
-# => all artefacts in storylang.json are (re)generated, overwriting existing files
 ```
 
 ### Typical Workflow
 
-1. Define your `config/storylang.json` spec (manually or with the help of an AI tool), then run `storylang push` to generate the project files.
-2. Run `storylang pull` periodically to keep the spec in sync as the project evolves.
+Run `node storylang` periodically to keep `config/storylang.json` in sync as the project evolves.
 
 ---
 
@@ -796,10 +783,10 @@ export default class UserCard extends Component {
 ```javascript
 // app/helpers/format-currency.js
 export default function formatCurrency(amount, currency = 'USD') {
-	return new Intl.NumberFormat('en-US', {
-		style: 'currency',
-		currency: currency,
-	}).format(amount);
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: currency,
+  }).format(amount);
 }
 ```
 
