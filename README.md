@@ -970,6 +970,21 @@ async uploadFile(file) {
 
 ---
 
+## Deploying to Junction (Self-Hosted)
+
+After building your Ember app, run `php-dist` to prepare the `dist/` folder for PHP middleware:
+
+```bash
+ember build -prod
+node php-dist
+```
+
+This reads `dist/index.html`, injects PHP includes (`_init.php`, `_head.php`, `_head_footer.php`, `_body_footer.php`), strips `<title>` and `<meta name="description">`, and writes `dist/index.php`.
+
+You can then upload the `dist/` folder to [Junction (open source)](http://localhost:12002) and view your app at **http://localhost:12004**.
+
+---
+
 ## Best Practices
 
 1. **Module Access**: Remember to use `modules.field_name` for backend fields
