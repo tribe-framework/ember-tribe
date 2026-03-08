@@ -982,7 +982,7 @@ export default class FileCardComponent extends Component {
 
 ---
 
-## Code Examples
+## Forms and Input Fields
 
 ### File upload javascript example
 
@@ -1014,13 +1014,152 @@ async uploadFile(file) {
 }
 ```
 
-### Input field example
+### Input and Textarea fields
+
+Use Ember's built-in `<Input>` component instead of a raw `<input>` tag — it automatically updates bound state via `@value`.
 
 ```handlebars
+<div class="mb-3">
+  <label for="input-name" class="form-label">Name:</label>
+  <Input
+    id="input-name"
+    class="form-control"
+    @type="text"
+    @value={{this.name}}
+    disabled={{this.isReadOnly}}
+    maxlength="50"
+    placeholder="Enter your name"
+  />
+</div>
 ```
 
 ```javascript
+import Component from '@glimmer/component';
+import { tracked } from '@glimmer/tracking';
+
+export default class ExampleComponent extends Component {
+  @tracked name = '';
+  @tracked isReadOnly = false;
+}
 ```
+
+```handlebars
+<div class="form-check mb-3">
+  <Input
+    id="admin-checkbox"
+    class="form-check-input"
+    @type="checkbox"
+    @checked={{this.isAdmin}}
+    {{on "input" this.validateRole}}
+  />
+  <label for="admin-checkbox" class="form-check-label">Is Admin?</label>
+</div>
+```
+
+```handlebars
+<div class="mb-3">
+  <label for="user-comment" class="form-label">Comment:</label>
+  <Textarea
+    id="user-comment"
+    class="form-control"
+    @value={{this.userComment}}
+    rows="6"
+  />
+</div>
+```
+
+**Key rules for `<Input>` and `<Textarea>`:**
+- `@value`, `@type`, and `@checked` must be passed as **arguments** (with `@`).
+- Use the `{{on}}` modifier for event handling (e.g. `{{on "input" this.handler}}`).
+- Bootstrap styles `form-control` correctly when `disabled` is present
+
+### ember-power-select example
+
+`ember-power-select` is the recommended way to implement searchable, single, and multi-select dropdowns in ember-tribe. It is pre-installed and works alongside Bootstrap 5.x. Use it wherever a native `<select>` would be insufficient — e.g. when you need search/filter, async options, or multi-select.
+
+**Single select (Bootstrap-compatible wrapper):**
+
+```handlebars
+<div class="mb-3">
+  <label class="form-label">Assign Category:</label>
+  <div class="form-control p-0 border-0">
+    <PowerSelect
+      @options={{this.categories}}
+      @selected={{this.selectedCategory}}
+      @onChange={{this.handleCategoryChange}}
+      @placeholder="Select a category"
+      as |category|
+    >
+      {{category.name}}
+    </PowerSelect>
+  </div>
+</div>
+```
+
+```javascript
+import Component from '@glimmer/component';
+import { tracked } from '@glimmer/tracking';
+import { action } from '@ember/object';
+
+export default class ExampleComponent extends Component {
+  @tracked selectedCategory = null;
+
+  categories = [
+    { id: 1, name: 'Design' },
+    { id: 2, name: 'Engineering' },
+    { id: 3, name: 'Marketing' },
+  ];
+
+  @action
+  handleCategoryChange(category) {
+    this.selectedCategory = category;
+  }
+}
+```
+
+**Multi-select variant:**
+
+```handlebars
+<div class="mb-3">
+  <label class="form-label">Assign Tags:</label>
+  <div class="form-control p-0 border-0">
+    <PowerSelectMultiple
+      @options={{this.availableTags}}
+      @selected={{this.selectedTags}}
+      @onChange={{this.handleTagsChange}}
+      @placeholder="Select tags"
+      as |tag|
+    >
+      {{tag.label}}
+    </PowerSelectMultiple>
+  </div>
+</div>
+```
+
+**Async options loaded from the store:**
+
+```handlebars
+<div class="mb-3">
+  <label class="form-label">Select Project:</label>
+  <div class="form-control p-0 border-0">
+    <PowerSelect
+      @options={{this.projects}}
+      @selected={{this.selectedProject}}
+      @onChange={{this.handleProjectChange}}
+      @searchField="name"
+      @placeholder="Search projects..."
+      as |project|
+    >
+      {{project.modules.name}}
+    </PowerSelect>
+  </div>
+</div>
+```
+
+**Key rules for `<PowerSelect>`:**
+- `@options`, `@selected`, and `@onChange` are always required arguments.
+- Use `@searchField` to specify which object property drives the built-in search filter.
+- For multi-select, use `<PowerSelectMultiple>` — the `@onChange` callback receives the full updated array, so assign it directly to your tracked property.
 
 ---
 
