@@ -4,6 +4,46 @@ An addon that connects EmberJS to Tribe API, bridging the gap between backend da
 
 Tribe is a project management framework built for ease of collaboration - https://github.com/tribe-framework/tribe
 
+---
+
+## Table of Contents
+
+- [Installation and Setup](#installation-and-setup)
+- [Folder Structure](#folder-structure)
+- [Best Practices for AI Generated Code](#best-practices-for-ai-generated-code)
+  - [Code Rules](#code-rules)
+  - [Storylang Rules](#storylang-rules)
+    - [Types](#types)
+    - [Routes](#routes)
+    - [Controllers](#controllers)
+    - [Helpers](#helpers)
+    - [Modifiers](#modifiers)
+    - [Services](#services)
+    - [Components](#components)
+- [Storylang]
+  - [Storylang CLI](#storylang-cli)
+  - [Storylang.json Documentation](#storylangjson-documentation)
+    - [Types](#1-types)
+    - [Routes](#2-routes)
+    - [Helpers](#3-helpers)
+    - [Modifiers](#4-modifiers)
+    - [Services](#5-services)
+    - [Components](#6-components)
+    - [Data Types Reference](#data-types-reference)
+    - [Integration with Other Files](#integration-with-other-files)
+- [EmberJS]
+  - [Ember-Tribe Development Guide](#ember-tribe-development-guide)
+    - [EmberData Integration](#emberdata-integration)
+    - [Route Generation](#route-generation)
+    - [Helper System](#helper-system)
+    - [Modifier System](#modifier-system)
+    - [Services Integration](#services-integration)
+    - [Component Architecture](#component-architecture)
+    - [Forms and Input Fields](#forms-and-input-fields)
+  - [Deploying to Junction (Self-Hosted)](#deploying-to-junction-self-hosted)
+
+---
+
 ## Installation and Setup
 
 ### Prerequisites
@@ -41,7 +81,7 @@ The addon automatically configures following essential packages:
 
 ---
 
-## Core File Structure
+## Folder Structure
 
 ```
 app/
@@ -65,7 +105,7 @@ installer.sh
 
 These rules are **mandatory** for all Tribe-compatible code. Follow them strictly and do not deviate unless explicitly instructed.
 
-### General Rules
+### Code Rules
 
 1. **Bootstrap 5.x — Required Foundation**
    Use Bootstrap 5.x as the sole design system for all layout, spacing, and responsive behaviour. Do not introduce custom CSS frameworks or utility libraries that conflict with Bootstrap. Follow Bootstrap conventions strictly.
@@ -90,7 +130,7 @@ These rules are **mandatory** for all Tribe-compatible code. Follow them strictl
 
 ---
 
-### Storylang Architecture Rules
+### Storylang Rules
 
 Follow this strict order of thinking when designing any feature:
 
@@ -102,20 +142,20 @@ Always begin by understanding your data types, then define the routes that load 
 
 **Types**
 
-11. **Start by Understanding Your Data**
+8. **Start by Understanding Your Data**
     Before writing any code, read the project description and `types.json` to understand the data model. Every architectural decision that follows — which routes to create, which services to build, whether components are even needed — depends on a clear understanding of the underlying types.
 
 ---
 
 **Routes**
 
-8. **Route Naming**
+9. **Route Naming**
    Match route names to user mental models. Use consistent, predictable naming conventions so that routes are self-documenting.
 
-9. **Routes Are for Fetching, Not Logic**
+10. **Routes Are for Fetching, Not Logic**
    Routes should primarily perform read/fetch operations and pass data down to components or services. Keep JavaScript in routes to a minimum — business logic belongs in components and services, not routes.
 
-10. **Route Parameters**
+11. **Route Parameters**
     Keep `get_vars` minimal and meaningful. Load only the data types that each specific route actually needs — avoid over-fetching.
 
 ---
@@ -132,31 +172,31 @@ Always begin by understanding your data types, then define the routes that load 
 
 **Helpers**
 
-17. **Helpers Must Be Pure and Stateless**
+14. **Helpers Must Be Pure and Stateless**
     A helper receives input and returns output — nothing else. Helpers must have no side effects and must not interact with the store, services, or DOM.
 
 ---
 
 **Modifiers**
 
-18. **Modifiers Own All DOM Interaction**
+15. **Modifiers Own All DOM Interaction**
     Any direct DOM manipulation or third-party library initialisation must live in a modifier.
 
 ---
 
 **Services**
 
-15. **Services Are the Core Logic Layer**
+16. **Services Are the Core Logic Layer**
     Services hold the primary business logic of the application. They interact with both routes and components and are the single source of truth for app-wide behaviour.
 
-16. **Keep Services Stateless When Possible**
+17. **Keep Services Stateless When Possible**
     Avoid storing transient state in services. Where services must depend on one another, use dependency injection.
 
 ---
 
 **Components**
 
-14. **Components are not always required**
+18. **Components are not always required**
     Before creating components, assess the scale of the project from its description. On small projects, fewer files means higher code readability — collapsing template logic directly into route templates is often the right call. On larger projects, the opposite is true: extracting repeatable UI into named components improves clarity, maintainability, and testability. Make this decision deliberately at the start, not as an afterthought.
 
 ---
@@ -246,6 +286,8 @@ The storylang.json file contains seven main sections:
 ### 2. Routes
 
 **Purpose**: Defines the application's routes and their requirements.
+
+> **Note on controllers**: In `storylang.json`, controllers are not listed as a separate top-level section. Instead, each controller is considered part of its corresponding route — just as a component's backing JavaScript class is part of its component entry. Controller actions, tracked variables, and query parameters should be specified within the route definition they belong to.
 
 **Format**:
 
@@ -471,6 +513,7 @@ The storylang.json file contains seven main sections:
 - Type names used in routes should match type names from `types.json`
 - The `types` section in storylang.json is the explicit bridge between your data types and your UI — always keep it in sync with `types.json`
 - Types are the gateway to persistent storage on the backend
+- For a full reference on the `types.json` format and its field definitions, see the official documentation at [https://github.com/tribe-framework/types.json](https://github.com/tribe-framework/types.json)
 
 ---
 
@@ -604,6 +647,25 @@ this.store.query('post', {
 });
 ```
 
+#### `modules` vs `filter`: AND vs OR Queries
+
+When querying records, `modules` and `filter` serve distinct purposes that map directly to how the backend constructs its SQL or query logic.
+
+**`modules`** applies **AND** logic: every key-value pair in the object must match for a record to be included. Use this when you want to narrow results to records that simultaneously satisfy all of the given conditions — for example, posts that are both `published` and belong to a specific `author_id`.
+
+**`filter`** applies **OR** logic: a record is included if it matches *any* of the key-value pairs. Use this when you want to broaden results across multiple values of a field — for example, items whose `category` is either `tech` or `design`.
+
+The two can be combined in the same query. For instance, to find all published posts that are tagged as either `news` or `feature`:
+
+```javascript
+this.store.query('post', {
+  modules: { status: 'published' }, // must be published
+  filter: { tag: 'news', section: 'feature' }, // tagged news OR in feature section
+});
+```
+
+Always prefer expressing these constraints via `modules` and `filter` over post-processing results in JavaScript — the backend handles this far more efficiently.
+
 Smart use of EmberData can significantly reduce size of the codebase. Make sure you take advantage of that.
 
 **Universal Default Module:**
@@ -630,9 +692,9 @@ this.store.findRecord('post', 1).then((post) => {
 ```javascript
 this.store
   .query('person', {
-    modules: { name: 'Peter', location: 'delhi' }, //results with AND
+    modules: { name: 'Peter', location: 'delhi' }, //AND: both conditions must match
     /*
-    filter: { name: 'Peter', location: 'delhi' } //results with OR
+    filter: { name: 'Peter', location: 'delhi' } //OR: either condition can match
     sort: "location,-age,name", //minus for descending order of that field, default is -id
     page: { offset:0, limit:-1 }, //for pagination or smart uses, -1 means everything
     ignore_ids: [10,14] //excludes these IDs from results
