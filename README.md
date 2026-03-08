@@ -26,7 +26,18 @@ The addon automatically configures following essential packages:
 
 **Ember Addons:** `ember-cli-dotenv`, `ember-cli-sass`, `ember-modifier`, `ember-composable-helpers`, `ember-truth-helpers`, `ember-file-upload` , `ember-power-select`
 
-**NPM Packages:** `bootstrap`, `@popperjs/core`, `animate.css`, `video.js`, `swiper`,  `howler`
+**NPM Packages:** `bootstrap`, `@popperjs/core`, `animate.css`, `video.js`, `swiper`,  `howler`, `sortablejs`, `papaparse`
+
+**Built-in features that can be used in routes and components**:
+
+- **Layout**: `table`, `figure`, `accordion`, `card`, `list-group`, `navbar`, `nav`, `tab`, `breadcrumb`
+- **Interactive**: `button`, `button-group`, `dropdown`, `modal`, `collapse`, `offcanvas`, `pagination`, `popover`, `tooltip`, `swiper-carousel`, `videojs-player`, `howlerjs-player`, `input-field`, `input-group`, `textarea`, `checkbox`, `radio`, `range`, `select`, `multi-select`, `date`, `file-uploader`, `alert`, `badge`, `toast`, `placeholder`, `progress`, `spinner`, `scrollspy`
+
+**Preinstalled services in ember-tribe**:
+
+- `store`: Ember Data store for CRUD operations
+- `router`: Ember router service for navigation
+- `types`: Automatic model generation from backend tracks
 
 ---
 
@@ -47,6 +58,106 @@ config/
 └── storylang.json
 installer.sh
 ```
+
+---
+
+## Best Practices for AI generated code
+
+These rules are **mandatory** for all Tribe-compatible code. Follow them strictly and do not deviate unless explicitly instructed.
+
+### General Rules
+
+1. **Bootstrap 5.x — Required Foundation**
+   Use Bootstrap 5.x as the sole design system for all layout, spacing, and responsive behaviour. Do not introduce custom CSS frameworks or utility libraries that conflict with Bootstrap. Follow Bootstrap conventions strictly.
+
+2. **Backend Field Access**
+   Always access backend fields through the `modules` object — e.g. `object.modules.field_name`. Never access backend fields directly.
+
+3. **npm Packages over Ember Addons**
+   When an npm package and an Ember addon offer equivalent functionality, always prefer the npm package for better long-term compatibility.
+
+4. **Icons — FontAwesome 6.x Only**
+   Use FontAwesome 6.x for all icons. Do not use any other icon library unless the project description explicitly specifies one.
+
+5. **Animations — Subtle and Purposeful**
+   If animations are needed, use `animate.css`. Keep animations subtle — prefer fades and minimal slides. Avoid anything that feels flashy or distracting.
+
+6. **EmberData Caching**
+   When data has already been loaded into the store, retrieve it with `peekRecord` instead of making a new network request.
+
+7. **Backend Filtering over Frontend Filtering**
+   For sorting and filtering data, always use `this.store.query` with backend query parameters. Do not filter or sort arrays on the frontend when the backend can do it.
+
+---
+
+### Storylang Architecture Rules
+
+Follow this strict order of thinking when designing any feature:
+
+> **Understand Types → Routes → Controllers → Helpers → Modifiers → Services → Components**
+
+Always begin by understanding your data types, then define the routes that load that data, then wire up controllers to handle user actions, then extract reusable template logic into helpers, then isolate DOM behaviour into modifiers, then move app-wide logic into services, and finally — only when the project's scale warrants it — extract repeatable UI into components.
+
+---
+
+**Types**
+
+11. **Start by Understanding Your Data**
+    Before writing any code, read the project description and `types.json` to understand the data model. Every architectural decision that follows — which routes to create, which services to build, whether components are even needed — depends on a clear understanding of the underlying types.
+
+---
+
+**Routes**
+
+8. **Route Naming**
+   Match route names to user mental models. Use consistent, predictable naming conventions so that routes are self-documenting.
+
+9. **Routes Are for Fetching, Not Logic**
+   Routes should primarily perform read/fetch operations and pass data down to components or services. Keep JavaScript in routes to a minimum — business logic belongs in components and services, not routes.
+
+10. **Route Parameters**
+    Keep `get_vars` minimal and meaningful. Load only the data types that each specific route actually needs — avoid over-fetching.
+
+---
+
+**Controllers**
+
+12. **Controllers Bridge Routes and Templates**
+    Controllers sit between routes and templates, handling query parameters, user actions, and transient UI state that belongs to a specific route. Keep controllers focused — they are not a place for business logic or data fetching.
+
+13. **Keep Controllers Thin**
+    Delegate complex logic to services. A controller should primarily expose tracked properties and actions that the corresponding template needs directly.
+
+---
+
+**Helpers**
+
+17. **Helpers Must Be Pure and Stateless**
+    A helper receives input and returns output — nothing else. Helpers must have no side effects and must not interact with the store, services, or DOM.
+
+---
+
+**Modifiers**
+
+18. **Modifiers Own All DOM Interaction**
+    Any direct DOM manipulation or third-party library initialisation must live in a modifier.
+
+---
+
+**Services**
+
+15. **Services Are the Core Logic Layer**
+    Services hold the primary business logic of the application. They interact with both routes and components and are the single source of truth for app-wide behaviour.
+
+16. **Keep Services Stateless When Possible**
+    Avoid storing transient state in services. Where services must depend on one another, use dependency injection.
+
+---
+
+**Components**
+
+14. **Components are not always required**
+    Before creating components, assess the scale of the project from its description. On small projects, fewer files means higher code readability — collapsing template logic directly into route templates is often the right call. On larger projects, the opposite is true: extracting repeatable UI into named components improves clarity, maintainability, and testability. Make this decision deliberately at the start, not as an afterthought.
 
 ---
 
@@ -96,33 +207,18 @@ The storylang.json file contains seven main sections:
 
 ```json
 {
-  "implementation_approach": "...",
   "types": [...],
-  "components": [...],
   "routes": [...],
-  "services": [...],
   "helpers": [...],
-  "modifiers": [...]
+  "modifiers": [...],
+  "services": [...],
+  "components": [...]
 }
 ```
 
 ### Section Definitions
 
-### 1. Implementation Approach
-
-**Purpose**: Provides a high-level technical overview of how the frontend interface would work.
-
-**Format**:
-
-```json
-{
-  "implementation_approach": "Two-paragraph description explaining technical approach and key functionality."
-}
-```
-
----
-
-### 2. Types
+### 1. Types
 
 **Purpose**: Declares which data types from `types.json` and maps them to the components, routes, services, helpers and modifiers that consume them. This creates a traceable link between your data layer and your UI implementation.
 
@@ -147,60 +243,7 @@ The storylang.json file contains seven main sections:
 
 ---
 
-### 3. Components
-
-**Purpose**: Defines reusable UI components that will be built for the application.
-
-**Format**:
-
-```json
-{
-  "components": [
-    {
-      "name": "component-name",
-      "type": "component-type",
-      "tracked_vars": [{ "<variableName>": "<dataType>" }],
-      "inherited_args": [{ "<argumentName>": "<argType>" }],
-      "actions": ["action1", "action2"],
-      "helpers": ["helper1", "helper2"],
-      "modifiers": ["modifier1"],
-      "services": ["service1", "service2"]
-    }
-  ]
-}
-```
-
-**Built-in Component Types in ember-tribe**:
-
-- **Layout**: `table`, `figure`, `accordion`, `card`, `list-group`, `navbar`, `nav`, `tab`, `breadcrumb`
-- **Interactive**: `button`, `button-group`, `dropdown`, `modal`, `collapse`, `offcanvas`, `pagination`, `popover`, `tooltip`, `swiper-carousel`, `videojs-player`, `howlerjs-player`, `input-field`, `input-group`, `textarea`, `checkbox`, `radio`, `range`, `select`, `multi-select`, `date`, `file-uploader`, `alert`, `badge`, `toast`, `placeholder`, `progress`, `spinner`, `scrollspy`
-
-**Example**:
-
-```json
-{
-  "components": [
-    {
-      "name": "file-summary-card",
-      "type": "card",
-      "tracked_vars": [{ "isSelected": "bool" }, { "isExpanded": "bool" }],
-      "inherited_args": [
-        { "file": "var" },
-        { "onEdit": "action" },
-        { "onDelete": "action" }
-      ],
-      "actions": ["toggleSelection", "expandDetails", "editFile", "deleteFile"],
-      "helpers": ["formatDate", "truncateText"],
-      "modifiers": ["tooltip"],
-      "services": ["store", "router"]
-    }
-  ]
-}
-```
-
----
-
-### 4. Routes
+### 2. Routes
 
 **Purpose**: Defines the application's routes and their requirements.
 
@@ -218,6 +261,90 @@ The storylang.json file contains seven main sections:
       "services": ["service1"],
       "components": ["component1", "component2"],
       "types": ["type1", "type2"]
+    }
+  ]
+}
+```
+
+---
+
+### 3. Helpers
+
+**Purpose**: Defines custom template helpers — pure functions used in templates to format, compute or transform data for display.
+
+**Format**:
+
+```json
+{
+  "helpers": [
+    {
+      "name": "helper-name",
+      "description": "What this helper does",
+      "input_args": [{ "<argumentName>": "<dataType>" }],
+      "return": "<dataType>"
+    }
+  ]
+}
+```
+
+**Example**:
+
+```json
+{
+  "helpers": [
+    {
+      "name": "format-date",
+      "description": "Formats a raw ISO date string into a human-readable date",
+      "input_args": [{ "isoString": "string" }, { "format": "string" }],
+      "return": "string"
+    },
+    {
+      "name": "truncate-text",
+      "description": "Truncates a string to a given character limit and appends an ellipsis",
+      "input_args": [{ "text": "string" }, { "limit": "int" }],
+      "return": "string"
+    }
+  ]
+}
+```
+
+---
+
+### 4. Modifiers
+
+**Purpose**: Defines custom Ember modifiers — functions that directly interact with DOM elements to attach behaviour, third-party libraries or event listeners.
+
+**Format**:
+
+```json
+{
+  "modifiers": [
+    {
+      "name": "modifier-name",
+      "description": "What DOM behaviour this modifier applies",
+      "input_args": [{ "<argumentName>": "<dataType>" }],
+      "services": ["service1"]
+    }
+  ]
+}
+```
+
+**Example**:
+
+```json
+{
+  "modifiers": [
+    {
+      "name": "tooltip",
+      "description": "Initialises a Bootstrap tooltip on the target element using the provided label",
+      "input_args": [{ "label": "string" }, { "placement": "string" }],
+      "services": []
+    },
+    {
+      "name": "autofocus",
+      "description": "Sets focus on the target element when it is inserted into the DOM",
+      "input_args": [],
+      "services": []
     }
   ]
 }
@@ -245,18 +372,6 @@ The storylang.json file contains seven main sections:
 }
 ```
 
-**Built-in Services in ember-tribe**:
-
-- `store`: Ember Data store for CRUD operations
-- `router`: Ember router service for navigation
-- `types`: Automatic model generation from backend tracks
-- `bootstrap`: Bootstrap CSS framework with Popper.js
-- `papaparse`: CSV parsing library
-- `sortablejs`: Drag-and-drop sorting
-- `swiperjs`: Touch slider/carousel
-- `videojs`: Video player
-- `howlerjs`: Audio player
-
 **Example**:
 
 ```json
@@ -282,97 +397,47 @@ The storylang.json file contains seven main sections:
 
 ---
 
-### 6. Helpers
+### 6. Components
 
-**Purpose**: Defines custom template helpers — pure functions used in templates to format, compute or transform data for display.
-
-**Format**:
-
-```json
-{
-  "helpers": [
-    {
-      "name": "helper-name",
-      "description": "What this helper does",
-      "args": [{ "<argumentName>": "<dataType>" }],
-      "return": "<dataType>"
-    }
-  ]
-}
-```
-
-**Helper Properties**:
-
-- `name`: Kebab-case name of the helper
-- `description`: Brief description of what the helper computes or transforms
-- `args`: Input arguments the helper accepts
-- `return`: The data type the helper outputs
-
-**Example**:
-
-```json
-{
-  "helpers": [
-    {
-      "name": "format-date",
-      "description": "Formats a raw ISO date string into a human-readable date",
-      "args": [{ "isoString": "string" }, { "format": "string" }],
-      "return": "string"
-    },
-    {
-      "name": "truncate-text",
-      "description": "Truncates a string to a given character limit and appends an ellipsis",
-      "args": [{ "text": "string" }, { "limit": "int" }],
-      "return": "string"
-    }
-  ]
-}
-```
-
----
-
-### 7. Modifiers
-
-**Purpose**: Defines custom Ember modifiers — functions that directly interact with DOM elements to attach behaviour, third-party libraries or event listeners.
+**Purpose**: Defines reusable UI components that will be built for the application.
 
 **Format**:
 
 ```json
 {
-  "modifiers": [
+  "components": [
     {
-      "name": "modifier-name",
-      "description": "What DOM behaviour this modifier applies",
-      "args": [{ "<argumentName>": "<dataType>" }],
-      "services": ["service1"]
+      "name": "component-name",
+      "type": "component-type",
+      "tracked_vars": [{ "<variableName>": "<dataType>" }],
+      "inherited_args": [{ "<argumentName>": "<argType>" }],
+      "actions": ["action1", "action2"],
+      "helpers": ["helper1", "helper2"],
+      "modifiers": ["modifier1"],
+      "services": ["service1", "service2"]
     }
   ]
 }
 ```
 
-**Modifier Properties**:
-
-- `name`: Kebab-case name of the modifier
-- `description`: Brief description of the DOM behaviour it attaches
-- `args`: Arguments passed into the modifier from the template
-- `services`: Ember services injected if needed
-
 **Example**:
 
 ```json
 {
-  "modifiers": [
+  "components": [
     {
-      "name": "tooltip",
-      "description": "Initialises a Bootstrap tooltip on the target element using the provided label",
-      "args": [{ "label": "string" }, { "placement": "string" }],
-      "services": []
-    },
-    {
-      "name": "autofocus",
-      "description": "Sets focus on the target element when it is inserted into the DOM",
-      "args": [],
-      "services": []
+      "name": "file-summary-card",
+      "type": "card",
+      "tracked_vars": [{ "isSelected": "bool" }, { "isExpanded": "bool" }],
+      "inherited_args": [
+        { "file": "var" },
+        { "onEdit": "action" },
+        { "onDelete": "action" }
+      ],
+      "actions": ["toggleSelection", "expandDetails", "editFile", "deleteFile"],
+      "helpers": ["formatDate", "truncateText"],
+      "modifiers": ["tooltip"],
+      "services": ["store", "router"]
     }
   ]
 }
@@ -406,90 +471,6 @@ The storylang.json file contains seven main sections:
 - Type names used in routes should match type names from `types.json`
 - The `types` section in storylang.json is the explicit bridge between your data types and your UI — always keep it in sync with `types.json`
 - Types are the gateway to persistent storage on the backend
-
----
-
-## Best Practices for AI generated code
-
-These rules are **mandatory** for all Tribe-compatible code. Follow them strictly and do not deviate unless explicitly instructed.
-
-### General Rules
-
-1. **Bootstrap 5.x — Required Foundation**
-   Use Bootstrap 5.x as the sole design system for all layout, spacing, and responsive behaviour. Do not introduce custom CSS frameworks or utility libraries that conflict with Bootstrap. Follow Bootstrap conventions strictly.
-
-2. **Backend Field Access**
-   Always access backend fields through the `modules` object — e.g. `object.modules.field_name`. Never access backend fields directly.
-
-3. **npm Packages over Ember Addons**
-   When an npm package and an Ember addon offer equivalent functionality, always prefer the npm package for better long-term compatibility.
-
-4. **Icons — FontAwesome 6.x Only**
-   Use FontAwesome 6.x for all icons. Do not use any other icon library unless the project description explicitly specifies one.
-
-5. **Animations — Subtle and Purposeful**
-   If animations are needed, use `animate.css`. Keep animations subtle — prefer fades and minimal slides. Avoid anything that feels flashy or distracting.
-
-6. **EmberData Caching**
-   When data has already been loaded into the store, retrieve it with `peekRecord` instead of making a new network request.
-
-7. **Backend Filtering over Frontend Filtering**
-   For sorting and filtering data, always use `this.store.query` with backend query parameters. Do not filter or sort arrays on the frontend when the backend can do it.
-
----
-
-### Storylang Architecture Rules
-
-Follow this strict order of thinking when designing any feature:
-
-> **Routes → Components → Services → Helpers → Modifiers**
-
-Always begin with routes, then extract repeatable template logic into components, then move app-wide logic into services, then extract reusable functions into helpers, and finally isolate DOM behaviour into modifiers.
-
----
-
-**Routes**
-
-8. **Route Naming**
-   Match route names to user mental models. Use consistent, predictable naming conventions so that routes are self-documenting.
-
-9. **Routes Are for Fetching, Not Logic**
-   Routes should primarily perform read/fetch operations and pass data down to components or services. Keep JavaScript in routes to a minimum — business logic belongs in components and services, not routes.
-
-10. **Route Parameters**
-    Keep `get_vars` minimal and meaningful. Load only the data types that each specific route actually needs — avoid over-fetching.
-
----
-
-**Helpers**
-
-17. **Helpers Must Be Pure and Stateless**
-    A helper receives input and returns output — nothing else. Helpers must have no side effects and must not interact with the store, services, or DOM.
-
----
-
-**Modifiers**
-
-18. **Modifiers Own All DOM Interaction**
-    Any direct DOM manipulation or third-party library initialisation must live in a modifier.
-
----
-
-**Components**
-
-
-14. **Components are not always required**
-
----
-
-**Services**
-
-15. **Services Are the Core Logic Layer**
-    Services hold the primary business logic of the application. They interact with both routes and components and are the single source of truth for app-wide behaviour.
-
-16. **Keep Services Stateless When Possible**
-    Avoid storing transient state in services. Where services must depend on one another, use dependency injection.
-
 
 ---
 
@@ -676,66 +657,6 @@ await post.save(); // => PATCH request
 // Delete
 let post = this.store.peekRecord('post', 2);
 post.destroyRecord(); // => DELETE request
-```
-
----
-
-## Component Architecture
-
-### Component Structure
-
-```javascript
-// Component class
-import Component from '@glimmer/component';
-import { tracked } from '@glimmer/tracking';
-import { action } from '@ember/object';
-import { service } from '@ember/service';
-
-export default class FileCardComponent extends Component {
-  @service store;
-  @tracked isSelected = false;
-
-  @action
-  toggleSelection() {
-    this.isSelected = !this.isSelected;
-  }
-}
-```
-
-### Template Patterns
-
-```handlebars
-<div
-  class='card {{if this.isSelected "border-primary"}}'
-  {{on 'click' this.toggleSelection}}
->
-  <div class='card-body'>
-    <h5 class='card-title'>{{@file.modules.title}}</h5>
-    <p class='card-text'>{{@file.modules.description}}</p>
-  </div>
-</div>
-```
-
----
-
-## Services Integration
-
-Make services based on storylang.json service definitions:
-
-```javascript
-// app/services/visualization-builder.js
-import Service from '@ember/service';
-import { tracked } from '@glimmer/tracking';
-import { service } from '@ember/service';
-
-export default class VisualizationBuilderService extends Service {
-  @service store;
-  @tracked supportedTypes = ['network', 'tree', 'sankey'];
-
-  buildVisualization(files, type, config) {
-    // Service logic implementation
-  }
-}
 ```
 
 ---
@@ -1001,9 +922,69 @@ export default class CartContentsComponent extends Component {
 
 ---
 
-## Code Generation Process
+## Services Integration
 
-### File Upload Javascript Example
+Make services based on storylang.json service definitions:
+
+```javascript
+// app/services/visualization-builder.js
+import Service from '@ember/service';
+import { tracked } from '@glimmer/tracking';
+import { service } from '@ember/service';
+
+export default class VisualizationBuilderService extends Service {
+  @service store;
+  @tracked supportedTypes = ['network', 'tree', 'sankey'];
+
+  buildVisualization(files, type, config) {
+    // Service logic implementation
+  }
+}
+```
+
+---
+
+## Component Architecture
+
+### Component Structure
+
+```javascript
+// Component class
+import Component from '@glimmer/component';
+import { tracked } from '@glimmer/tracking';
+import { action } from '@ember/object';
+import { service } from '@ember/service';
+
+export default class FileCardComponent extends Component {
+  @service store;
+  @tracked isSelected = false;
+
+  @action
+  toggleSelection() {
+    this.isSelected = !this.isSelected;
+  }
+}
+```
+
+### Template Patterns
+
+```handlebars
+<div
+  class='card {{if this.isSelected "border-primary"}}'
+  {{on 'click' this.toggleSelection}}
+>
+  <div class='card-body'>
+    <h5 class='card-title'>{{@file.modules.title}}</h5>
+    <p class='card-text'>{{@file.modules.description}}</p>
+  </div>
+</div>
+```
+
+---
+
+## Code Examples
+
+### File upload javascript example
 
 ```javascript
 import ENV from '<your-application-name>/config/environment';
@@ -1031,6 +1012,14 @@ async uploadFile(file) {
     file.state = 'aborted';
   }
 }
+```
+
+### Input field example
+
+```handlebars
+```
+
+```javascript
 ```
 
 ---
