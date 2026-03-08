@@ -409,22 +409,87 @@ The storylang.json file contains seven main sections:
 
 ---
 
-### Storylang Best Practices
+## Best Practices for AI generated code
 
-**Always begin your thought process with routes → then move repeatable template logic into components → then move repeatable app-wide logic from components and routes to services → then extract reusable template and component functions into helpers → then extract template and component DOM behaviour into modifiers**
+These rules are **mandatory** for all Tribe-compatible code. Follow them strictly and do not deviate unless explicitly instructed.
 
-1. **Start with Routes**: Match route names to user mental models and use consistent naming conventions
-2. **Minimize Route Logic**: Preferably fetch (read) type data in routes and then pass that data to components or services. Other than fetching type data, minimize the use of javascript in routes — Javascript is meant to be in components and services more than in routes
-3. **Route Parameters**: Keep get_vars minimal and meaningful, and load only necessary types for each route
-4. **Component Focus**: Keep components focused on single responsibilities and use descriptive, kebab-case names. Names should indicate which built-in ember-tribe component to use.
-5. **Data Flow**: Receive backend data down from routes (via inherited_args) rather than fetching (reading) in components
-6. **Component Actions**: Non-read functions — create, update, delete — can all happen well at component-level
-7. **Service Integration**: Use services directly in both components and routes for app-wide logic
-8. **Service Architecture**: Keep services stateless when possible and use dependency injection for service composition
-9. **Service Role**: Services interact with both routes and components and store the core logic of the application
-10. **Helpers**: Keep helpers pure and stateless — they should only receive input and return output with no side effects
-11. **Modifiers**: Use modifiers to isolate all direct DOM manipulation and third-party library initialisation from component logic
-12. **Types Mapping**: Populate the `types` section as you define your routes and components — it is your traceability layer between data types and UI
+### General Rules
+
+1. **Bootstrap 5.x — Required Foundation**
+   Use Bootstrap 5.x as the sole design system for all layout, spacing, and responsive behaviour. Do not introduce custom CSS frameworks or utility libraries that conflict with Bootstrap. Follow Bootstrap conventions strictly.
+
+2. **Backend Field Access**
+   Always access backend fields through the `modules` object — e.g. `object.modules.field_name`. Never access backend fields directly.
+
+3. **npm Packages over Ember Addons**
+   When an npm package and an Ember addon offer equivalent functionality, always prefer the npm package for better long-term compatibility.
+
+4. **Icons — FontAwesome 6.x Only**
+   Use FontAwesome 6.x for all icons. Do not use any other icon library unless the project description explicitly specifies one.
+
+5. **Animations — Subtle and Purposeful**
+   If animations are needed, use `animate.css`. Keep animations subtle — prefer fades and minimal slides. Avoid anything that feels flashy or distracting.
+
+6. **EmberData Caching**
+   When data has already been loaded into the store, retrieve it with `peekRecord` instead of making a new network request.
+
+7. **Backend Filtering over Frontend Filtering**
+   For sorting and filtering data, always use `this.store.query` with backend query parameters. Do not filter or sort arrays on the frontend when the backend can do it.
+
+---
+
+### Storylang Architecture Rules
+
+Follow this strict order of thinking when designing any feature:
+
+> **Routes → Components → Services → Helpers → Modifiers**
+
+Always begin with routes, then extract repeatable template logic into components, then move app-wide logic into services, then extract reusable functions into helpers, and finally isolate DOM behaviour into modifiers.
+
+---
+
+**Routes**
+
+8. **Route Naming**
+   Match route names to user mental models. Use consistent, predictable naming conventions so that routes are self-documenting.
+
+9. **Routes Are for Fetching, Not Logic**
+   Routes should primarily perform read/fetch operations and pass data down to components or services. Keep JavaScript in routes to a minimum — business logic belongs in components and services, not routes.
+
+10. **Route Parameters**
+    Keep `get_vars` minimal and meaningful. Load only the data types that each specific route actually needs — avoid over-fetching.
+
+---
+
+**Helpers**
+
+17. **Helpers Must Be Pure and Stateless**
+    A helper receives input and returns output — nothing else. Helpers must have no side effects and must not interact with the store, services, or DOM.
+
+---
+
+**Modifiers**
+
+18. **Modifiers Own All DOM Interaction**
+    Any direct DOM manipulation or third-party library initialisation must live in a modifier.
+
+---
+
+**Components**
+
+
+14. **Components are not always required**
+
+---
+
+**Services**
+
+15. **Services Are the Core Logic Layer**
+    Services hold the primary business logic of the application. They interact with both routes and components and are the single source of truth for app-wide behaviour.
+
+16. **Keep Services Stateless When Possible**
+    Avoid storing transient state in services. Where services must depend on one another, use dependency injection.
+
 
 ---
 
@@ -982,19 +1047,6 @@ node php-dist
 This reads `dist/index.html`, injects PHP includes (`_init.php`, `_head.php`, `_head_footer.php`, `_body_footer.php`), strips `<title>` and `<meta name="description">`, and writes `dist/index.php`.
 
 You can then upload the `dist/` folder to [Junction (open source)](http://localhost:12002) and view your app at **http://localhost:12004**.
-
----
-
-## Best Practices
-
-1. **Module Access**: Remember to use `modules.field_name` for backend fields
-2. **npm packages vs ember addons**: Prioritize npm packages over ember addons for better compatibility, when both are offering similar functionality
-3. **Minimal Controllers**: Logic should ideally reside in components and services
-4. **Bootstrap 5.x Foundation**: Responsive, accessible design system
-5. **Use FontAwesome 6.x**: Comprehensive icon library
-6. **Animations**: If required, use animate.css for enhanced user experience. Prefer subtle animations (fadeIn, slideIn). Avoid overwhelming users with excessive animation
-7. **Access Cache**: Leverage EmberData caching with `peekRecord`
-8. **Avoid array manipulations of backend data**: Use backend filtering over frontend array manipulation
 
 ---
 
