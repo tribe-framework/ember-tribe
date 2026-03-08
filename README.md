@@ -20,7 +20,7 @@ Tribe is a project management framework built for ease of collaboration - https:
     - [Modifiers](#modifiers)
     - [Services](#services)
     - [Components](#components)
-- [Storylang]
+- [Storylang](#storylang)
   - [Storylang CLI](#storylang-cli)
   - [Storylang.json Documentation](#storylangjson-documentation)
     - [Types](#1-types)
@@ -31,7 +31,7 @@ Tribe is a project management framework built for ease of collaboration - https:
     - [Components](#6-components)
     - [Data Types Reference](#data-types-reference)
     - [Integration with Other Files](#integration-with-other-files)
-- [EmberJS]
+- [EmberJS](#emberjs)
   - [Ember-Tribe Development Guide](#ember-tribe-development-guide)
     - [EmberData Integration](#emberdata-integration)
     - [Route Generation](#route-generation)
@@ -201,11 +201,13 @@ Always begin by understanding your data types, then define the routes that load 
 
 ---
 
-## Storylang CLI
+## Storylang
+
+### Storylang CLI
 
 ember-tribe ships with a command-line tool called `storylang` that synchronises the `config/storylang.json` specification with the actual Ember project files.
 
-### Usage
+#### Usage
 
 ```bash
 node storylang
@@ -222,26 +224,26 @@ node storylang
 # => config/storylang.json updated from project files
 ```
 
-### Typical Workflow
+#### Typical Workflow
 
 Run `node storylang` periodically to keep `config/storylang.json` in sync as the project evolves.
 
 ---
 
-## Storylang.json Documentation
+### Storylang.json Documentation
 
-### Overview
+#### Overview
 
 Storylang.json is a structured configuration file used in the ember-tribe ecosystem to define the frontend implementation of your application. It is found at `config/storylang.json`. It works in conjunction with your `types.json` (which defines your data types) to create a complete frontend specification.
 
-### Purpose
+#### Purpose
 
 The storylang.json file serves as a blueprint for frontend developers to understand:
 
 - What routes, components, services, helpers, modifiers and types are required
 - How data flows through the application
 
-### File Structure
+#### File Structure
 
 The storylang.json file contains seven main sections:
 
@@ -256,9 +258,9 @@ The storylang.json file contains seven main sections:
 }
 ```
 
-### Section Definitions
+#### Section Definitions
 
-### 1. Types
+#### 1. Types
 
 **Purpose**: Declares which data types from `types.json` and maps them to the components, routes, services, helpers and modifiers that consume them. This creates a traceable link between your data layer and your UI implementation.
 
@@ -283,7 +285,7 @@ The storylang.json file contains seven main sections:
 
 ---
 
-### 2. Routes
+#### 2. Routes
 
 **Purpose**: Defines the application's routes and their requirements.
 
@@ -310,7 +312,7 @@ The storylang.json file contains seven main sections:
 
 ---
 
-### 3. Helpers
+#### 3. Helpers
 
 **Purpose**: Defines custom template helpers — pure functions used in templates to format, compute or transform data for display.
 
@@ -352,7 +354,7 @@ The storylang.json file contains seven main sections:
 
 ---
 
-### 4. Modifiers
+#### 4. Modifiers
 
 **Purpose**: Defines custom Ember modifiers — functions that directly interact with DOM elements to attach behaviour, third-party libraries or event listeners.
 
@@ -394,7 +396,7 @@ The storylang.json file contains seven main sections:
 
 ---
 
-### 5. Services
+#### 5. Services
 
 **Purpose**: Defines custom Ember services needed by the application.
 
@@ -439,7 +441,7 @@ The storylang.json file contains seven main sections:
 
 ---
 
-### 6. Components
+#### 6. Components
 
 **Purpose**: Defines reusable UI components that will be built for the application.
 
@@ -487,9 +489,9 @@ The storylang.json file contains seven main sections:
 
 ---
 
-### Data Types Reference
+#### Data Types Reference
 
-### Data Types (dataType)
+#### Data Types (dataType)
 
 - `string`: Text values
 - `int`: Integer numbers
@@ -497,7 +499,7 @@ The storylang.json file contains seven main sections:
 - `array`: List of items
 - `object`: Complex data structure
 
-### Argument Types (argType)
+#### Argument Types (argType)
 
 - `var`: Passed data/state
 - `fn`: Callback function
@@ -506,9 +508,9 @@ The storylang.json file contains seven main sections:
 
 ---
 
-### Integration with Other Files
+#### Integration with Other Files
 
-### With types.json
+#### With types.json
 
 - Type names used in routes should match type names from `types.json`
 - The `types` section in storylang.json is the explicit bridge between your data types and your UI — always keep it in sync with `types.json`
@@ -517,13 +519,15 @@ The storylang.json file contains seven main sections:
 
 ---
 
-## Ember-Tribe Development Guide
+## EmberJS
 
-### Required File Outputs
+### Ember-Tribe Development Guide
+
+#### Required File Outputs
 
 Make separate, complete code files for each category:
 
-### Example installer.sh
+#### Example installer.sh
 
 ```bash
 npm i chart.js
@@ -537,7 +541,7 @@ ember g modifier tooltip
 ember g service visualization-builder
 ```
 
-### Default styling
+#### Default styling
 
 Following is the default style that comes with tribe. Use the app.scss file for all style code. Change this based on your design styling requirements.
 
@@ -579,7 +583,7 @@ $spacers: (
 @import 'node_modules/animate.css/animate';
 ```
 
-### Default application structure
+#### Default application structure
 
 ```app/templates/application.hbs
 {{page-title 'Your Application Name'}}
@@ -617,11 +621,11 @@ export default class ApplicationRoute extends Route {
 
 ---
 
-## EmberData Integration
+### EmberData Integration
 
 ember-tribe automatically generates models from backend track definitions through the `types` service:
 
-### Data Access Patterns
+#### Data Access Patterns
 
 EmberData operations always use a "modules" key for field access, except for `.id` and `.slug` properties. All field names from backend storage use underscore notation: `modules.any_field`.
 
@@ -634,7 +638,7 @@ console.log(post.modules.title); // Field access
 console.log(post.modules.content_privacy); // Universal field
 ```
 
-### Query Operations
+#### Query Operations
 
 ```javascript
 // Complex queries
@@ -723,9 +727,9 @@ post.destroyRecord(); // => DELETE request
 
 ---
 
-## Route Generation
+### Route Generation
 
-### Route Creation
+#### Route Creation
 
 Make routes based on storylang.json route definitions:
 
@@ -752,9 +756,9 @@ export default class FilesRoute extends Route {
 
 ---
 
-## Helper System
+### Helper System
 
-### Global Helpers
+#### Global Helpers
 
 Make helpers based on storylang.json helper requirements:
 
@@ -769,7 +773,7 @@ export default helper(function formatDate([date, format = 'short']) {
 });
 ```
 
-### Template Usage
+#### Template Usage
 
 ```handlebars
 <span class='text-muted'>
@@ -779,9 +783,9 @@ export default helper(function formatDate([date, format = 'short']) {
 
 ---
 
-## Modifier System
+### Modifier System
 
-### DOM Interaction Modifiers
+#### DOM Interaction Modifiers
 
 Make modifiers for specific DOM manipulation needs:
 
@@ -799,7 +803,7 @@ export default modifier((element, [content]) => {
 });
 ```
 
-## Writing Helpers
+#### Writing Helpers
 
 Helper functions are JavaScript functions callable from Ember templates that perform computations or operations beyond basic template syntax, keeping templates clean while adding dynamic functionality.
 
@@ -854,7 +858,7 @@ export default function formatCurrency(amount, currency = 'USD') {
 - Local: Component-specific logic, simple transformations
 - Global: Reusable functionality across multiple components (formatting, calculations)
 
-### Component Architecture & Principle of Substitution
+#### Component Architecture & Principle of Substitution
 
 Ember components should be thought of as templates that re-execute from scratch whenever data changes. Write templates that produce correct output for any given input; Ember efficiently updates only what has changed.
 
@@ -900,7 +904,7 @@ export default class CounterComponent extends Component {
 }
 ```
 
-### Component Communication & Modifiers
+#### Component Communication & Modifiers
 
 **Design Pattern:**
 
@@ -948,7 +952,7 @@ Modifiers applied to components pass through via `...attributes`:
 <div ...attributes>...</div>
 ```
 
-### Services
+#### Services
 
 Services are Ember objects that persist for the entire application duration, providing shared state or persistent connections across different parts of your app.
 
@@ -984,7 +988,7 @@ export default class CartContentsComponent extends Component {
 
 ---
 
-## Services Integration
+### Services Integration
 
 Make services based on storylang.json service definitions:
 
@@ -1006,9 +1010,9 @@ export default class VisualizationBuilderService extends Service {
 
 ---
 
-## Component Architecture
+### Component Architecture
 
-### Component Structure
+#### Component Structure
 
 ```javascript
 // Component class
@@ -1028,7 +1032,7 @@ export default class FileCardComponent extends Component {
 }
 ```
 
-### Template Patterns
+#### Template Patterns
 
 ```handlebars
 <div
@@ -1044,9 +1048,9 @@ export default class FileCardComponent extends Component {
 
 ---
 
-## Forms and Input Fields
+### Forms and Input Fields
 
-### File upload javascript example
+#### File upload javascript example
 
 ```javascript
 import ENV from '<your-application-name>/config/environment';
@@ -1076,7 +1080,7 @@ async uploadFile(file) {
 }
 ```
 
-### Input and Textarea fields
+#### Input and Textarea fields
 
 Use Ember's built-in `<Input>` component instead of a raw `<input>` tag — it automatically updates bound state via `@value`.
 
@@ -1135,7 +1139,7 @@ export default class ExampleComponent extends Component {
 - Use the `{{on}}` modifier for event handling (e.g. `{{on "input" this.handler}}`).
 - Bootstrap styles `form-control` correctly when `disabled` is present
 
-### ember-power-select example
+#### ember-power-select example
 
 `ember-power-select` is the recommended way to implement searchable, single, and multi-select dropdowns in ember-tribe. It is pre-installed and works alongside Bootstrap 5.x. Use it wherever a native `<select>` would be insufficient — e.g. when you need search/filter, async options, or multi-select.
 
@@ -1225,7 +1229,7 @@ export default class ExampleComponent extends Component {
 
 ---
 
-## Deploying to Junction (Self-Hosted)
+### Deploying to Junction (Self-Hosted)
 
 After building your Ember app, run `php-dist` to prepare the `dist/` folder for PHP middleware:
 
