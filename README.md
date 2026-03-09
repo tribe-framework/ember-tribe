@@ -107,25 +107,28 @@ These rules are **mandatory** for all Tribe-compatible code. Follow them strictl
 
 ### Code Rules
 
-1. **Bootstrap 5.x — Required Foundation**
+1. **EmberJS 6.x Compatibility — Strictly Required**
+   All generated code must be strictly compatible with EmberJS 6.x.
+
+2. **Bootstrap 5.x — Required Foundation**
    Use Bootstrap 5.x as the sole design system for all layout, spacing, and responsive behaviour. Do not introduce custom CSS frameworks or utility libraries that conflict with Bootstrap. Follow Bootstrap conventions strictly.
 
-2. **Backend Field Access**
+3. **Backend Field Access**
    Always access backend fields through the `modules` object — e.g. `object.modules.field_name`. Never access backend fields directly.
 
-3. **npm Packages over Ember Addons**
+4. **npm Packages over Ember Addons**
    When an npm package and an Ember addon offer equivalent functionality, always prefer the npm package for better long-term compatibility.
 
-4. **Icons — FontAwesome 6.x Only**
+5. **Icons — FontAwesome 6.x Only**
    Use FontAwesome 6.x for all icons. Do not use any other icon library unless the project description explicitly specifies one.
 
-5. **Animations — Subtle and Purposeful**
+6. **Animations — Subtle and Purposeful**
    If animations are needed, use `animate.css`. Keep animations subtle — prefer fades and minimal slides. Avoid anything that feels flashy or distracting.
 
-6. **EmberData Caching**
+7. **EmberData Caching**
    When data has already been loaded into the store, retrieve it with `peekRecord` instead of making a new network request.
 
-7. **Backend Filtering over Frontend Filtering**
+8. **Backend Filtering over Frontend Filtering**
    For sorting and filtering data, always use `this.store.query` with backend query parameters. Do not filter or sort arrays on the frontend when the backend can do it.
 
 ---
