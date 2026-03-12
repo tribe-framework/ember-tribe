@@ -195,11 +195,14 @@ Always begin by understanding your data types, then define the routes that load 
 17. **Keep Services Stateless When Possible**
     Avoid storing transient state in services. Where services must depend on one another, use dependency injection.
 
+18. **All Backend Calls Must Live Inside `@action` Functions**
+    Any call to a `/custom/*.php` script must be made from within an `@action` function. This rule makes backend interactions explicit, traceable, and user-initiated by design.
+
 ---
 
 **Components**
 
-18. **Components are not always required**
+19. **Components are not always required**
     Before creating components, assess the scale of the project from its description. On small projects, fewer files means higher code readability — collapsing template logic directly into route templates is often the right call. On larger projects, the opposite is true: extracting repeatable UI into named components improves clarity, maintainability, and testability. Make this decision deliberately at the start, not as an afterthought.
 
 ---
@@ -303,7 +306,7 @@ The storylang.json file contains seven main sections:
       "name": "route-name", //should match Ember router.js
       "tracked_vars": [{ "<variableName>": "<dataType>" }],
       "get_vars": [{ "<paramName>": "<dataType>" }],
-      "actions": ["action1", "action2"],
+      "actions": ["frontend-action", { "backend-action": ["custom/path/file.php"] }],
       "helpers": ["helper1"],
       "services": ["service1"],
       "components": ["component1", "component2"],
@@ -312,6 +315,8 @@ The storylang.json file contains seven main sections:
   ]
 }
 ```
+
+> **Actions format**: `actions` is a mixed array. Pure frontend actions are plain strings. Actions that call one or more `/custom/*.php` scripts are objects whose key is the action name and whose value is the list of PHP paths called — e.g. `{ "save-record": ["custom/records/save.php"] }`.
 
 ---
 
@@ -411,7 +416,7 @@ The storylang.json file contains seven main sections:
     {
       "name": "service-name",
       "tracked_vars": [{ "<variableName>": "<dataType>" }],
-      "actions": ["action1", "action2"],
+      "actions": ["frontend-action", { "backend-action": ["custom/path/file.php"] }],
       "helpers": ["helper1"],
       "services": ["dependency1", "dependency2"]
     }
@@ -427,13 +432,14 @@ The storylang.json file contains seven main sections:
     {
       "name": "visualization-builder",
       "tracked_vars": [
-        { "currentVisualization": "object" },
+        { "dataMatrix": "object" },
         { "availableTypes": "array" }
       ],
+      "functions": {"build-visualization"},
       "actions": [
-        "createVisualization",
-        "updateVisualization",
-        "deleteVisualization"
+        "reset-state",
+        { "assemble-data-for-visualization": ["custom/visualizations/assemble-data.php"] },
+        "updateVisualization"
       ],
       "helpers": ["validateConfig", "generatePreview"],
       "services": ["store", "router"]
@@ -458,7 +464,7 @@ The storylang.json file contains seven main sections:
       "type": "component-type",
       "tracked_vars": [{ "<variableName>": "<dataType>" }],
       "inherited_args": [{ "<argumentName>": "<argType>" }],
-      "actions": ["action1", "action2"],
+      "actions": ["frontend-action", { "backend-action": ["custom/path/file.php"] }],
       "helpers": ["helper1", "helper2"],
       "modifiers": ["modifier1"],
       "services": ["service1", "service2"]
@@ -481,7 +487,7 @@ The storylang.json file contains seven main sections:
         { "onEdit": "action" },
         { "onDelete": "action" }
       ],
-      "actions": ["toggleSelection", "expandDetails", "editFile", "deleteFile"],
+      "actions": ["toggle-selection", "expand-details", { "save-file": ["custom/files/save.php"] }, { "delete-file": ["custom/files/delete.php"] }],
       "helpers": ["formatDate", "truncateText"],
       "modifiers": ["tooltip"],
       "services": ["store", "router"]
@@ -505,7 +511,7 @@ The storylang.json file contains seven main sections:
 #### Argument Types (argType)
 
 - `var`: Passed data/state
-- `fn`: Callback function
+- `function`: Callback function
 - `get`: Get function
 - `action`: User interaction handler
 
