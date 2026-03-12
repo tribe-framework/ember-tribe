@@ -313,58 +313,145 @@
 		font-size: 0.72rem;
 		font-weight: 600;
 	}
+
+	/* ── Welcome / empty state ── */
+	.sl-welcome {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		height: 100vh;
+		gap: 16px;
+		text-align: center;
+		padding: 40px;
+	}
+
+	.sl-welcome-logo {
+		width: 80px;
+		height: 80px;
+		margin-bottom: 8px;
+		opacity: 0.85;
+	}
+
+	.sl-welcome-title {
+		font-size: 1.6rem;
+		font-weight: 700;
+		color: #f0f6fc;
+		margin: 0;
+		letter-spacing: -0.02em;
+	}
+
+	.sl-welcome-sub {
+		font-size: 0.9rem;
+		color: #8b949e;
+		margin: 0;
+	}
+
+	.sl-welcome-hint {
+		font-size: 0.85rem;
+		color: #484f58;
+		margin: 0;
+	}
+
+	.sl-welcome-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		margin-top: 8px;
+		padding: 9px 22px;
+		border-radius: 8px;
+		background: #a78bfa;
+		color: #0d1117;
+		font-size: 0.875rem;
+		font-weight: 600;
+		text-decoration: none;
+		transition:
+			background 0.15s ease,
+			transform 0.1s ease;
+	}
+
+	.sl-welcome-btn:hover {
+		background: #c4b5fd;
+		transform: translateY(-1px);
+	}
 </style>
 
-<div class="sl-root">
+{{#if this.isEmpty}}
 
-	{{! ── Header ── }}
-	<header class="sl-header">
-		<h1>
-			Storylang
-		</h1>
-
-		<div class="sl-legend">
-			{{#each this.legendItems as |item|}}
-				<div class="sl-legend-item">
-					<span class="sl-legend-dot" style="background:{{item.color}}"></span>
-					{{item.label}}
-				</div>
-			{{/each}}
-		</div>
-	</header>
-
-	<div class="sl-body">
-
-		{{! ── Arc Diagram ── }}
-		<div class="sl-diagram-wrap">
-			<div class="sl-svg-container">
-				<Storylang::ArcDiagram
-					@nodes={{this.filteredNodes}}
-					@edges={{this.allEdges}}
-					@selectedNode={{this.selectedNode}}
-					@onSelectNode={{this.selectNode}}
-				/>
-			</div>
-		</div>
-
-		{{! ── Detail Panel ── }}
-		<aside class="sl-panel">
-			{{#if this.selectedNode}}
-				<Storylang::NodeDetail
-					@node={{this.selectedNode}}
-					@edges={{this.selectedNodeEdges}}
-					@onClose={{this.clearSelection}}
-					@onNavigate={{this.selectNode}}
-					@allNodes={{this.allNodes}}
-				/>
-			{{else}}
-				<div class="sl-panel-empty">
-					<p>Click any node on the diagram to inspect its connections and
-						properties.</p>
-				</div>
-			{{/if}}
-		</aside>
-
+	{{! ── Welcome / empty state ── }}
+	<div
+		class="bg-white vh-100 w-100 d-flex align-items-center justify-content-center flex-column"
+	>
+		<h1 class="display-6">Welcome to Tribe</h1>
+		<p class="lead">You have successfully installed
+			<strong>ember-tribe</strong></p>
+		<a
+			href="https://tribe-framework.org"
+			class="btn btn-success"
+			target="_blank"
+			rel="noopener noreferrer"
+		>
+			Read more
+		</a>
 	</div>
 
-</div>
+{{else}}
+	<div class="sl-root">
+
+		{{! ── Header ── }}
+		<header class="sl-header">
+			<h1>
+				Storylang
+			</h1>
+
+			<div class="sl-legend">
+				{{#each this.legendItems as |item|}}
+					<div class="sl-legend-item">
+						<span
+							class="sl-legend-dot"
+							style="background:{{item.color}}"
+						></span>
+						{{item.label}}
+					</div>
+				{{/each}}
+			</div>
+		</header>
+
+		<div class="sl-body">
+
+			{{! ── Arc Diagram ── }}
+			<div class="sl-diagram-wrap">
+				<div class="sl-svg-container">
+					<Storylang::ArcDiagram
+						@nodes={{this.filteredNodes}}
+						@edges={{this.allEdges}}
+						@selectedNode={{this.selectedNode}}
+						@onSelectNode={{this.selectNode}}
+					/>
+				</div>
+			</div>
+
+			{{! ── Detail Panel ── }}
+			<aside class="sl-panel">
+				{{#if this.selectedNode}}
+					<Storylang::NodeDetail
+						@node={{this.selectedNode}}
+						@edges={{this.selectedNodeEdges}}
+						@onClose={{this.clearSelection}}
+						@onNavigate={{this.selectNode}}
+						@allNodes={{this.allNodes}}
+					/>
+				{{else}}
+					<div class="sl-panel-empty">
+						<p>Click any node on the diagram to inspect its connections and
+							properties.</p>
+					</div>
+				{{/if}}
+			</aside>
+
+		</div>
+	</div>
+
+{{/if}}
+
+<div {{did-insert this.loadModel}}></div>
