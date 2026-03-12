@@ -198,11 +198,17 @@ Always begin by understanding your data types, then define the routes that load 
 18. **All Backend Calls Must Live Inside `@action` Functions**
     Any call to a `/custom/*.php` script must be made from within an `@action` function. This rule makes backend interactions explicit, traceable, and user-initiated by design.
 
+19. **Plain Methods Belong in `functions`, Not `actions`**
+    Internal methods, which carry no special Ember semantics, should be traced automatically under the `functions` key in `storylang.json`. Do not decorate them with `@action`. Keeping `actions` reserved for user-facing interactions makes the intent of each method immediately clear to anyone reading the spec.
+
+20. **Getters Are Derived Properties — Not Actions or Functions**
+    Native JavaScript `get` accessors (e.g. `get trustScoreColor()`) derive a display value, CSS class, or conditional flag from `this.args` or other state. They carry no side effects and require no `@action` decorator. Storylang captures them under the `getters` key, separate from `actions` and `functions`, so the distinction between user-facing interactions, internal logic, and pure derived state is always explicit in the spec.
+
 ---
 
 **Components**
 
-19. **Components are not always required**
+21. **Components are not always required**
     Before creating components, assess the scale of the project from its description. On small projects, fewer files means higher code readability — collapsing template logic directly into route templates is often the right call. On larger projects, the opposite is true: extracting repeatable UI into named components improves clarity, maintainability, and testability. Make this decision deliberately at the start, not as an afterthought.
 
 ---
@@ -264,6 +270,7 @@ The storylang.json file contains seven main sections:
 }
 ```
 
+
 #### Section Definitions
 
 #### 1. Types
@@ -306,7 +313,9 @@ The storylang.json file contains seven main sections:
       "name": "route-name", //should match Ember router.js
       "tracked_vars": [{ "<variableName>": "<dataType>" }],
       "get_vars": [{ "<paramName>": "<dataType>" }],
+      "getters": ["derived-property-name"],
       "actions": ["frontend-action", { "backend-action": ["custom/path/file.php"] }],
+      "functions": ["helper-method", "compute-something"],
       "helpers": ["helper1"],
       "services": ["service1"],
       "components": ["component1", "component2"],
@@ -416,7 +425,9 @@ The storylang.json file contains seven main sections:
     {
       "name": "service-name",
       "tracked_vars": [{ "<variableName>": "<dataType>" }],
+      "getters": ["derived-property-name"],
       "actions": ["frontend-action", { "backend-action": ["custom/path/file.php"] }],
+      "functions": ["internal-method"],
       "helpers": ["helper1"],
       "services": ["dependency1", "dependency2"]
     }
@@ -435,7 +446,7 @@ The storylang.json file contains seven main sections:
         { "dataMatrix": "object" },
         { "availableTypes": "array" }
       ],
-      "functions": {"build-visualization"},
+      "functions": ["build-visualization"],
       "actions": [
         "reset-state",
         { "assemble-data-for-visualization": ["custom/visualizations/assemble-data.php"] },
@@ -464,7 +475,9 @@ The storylang.json file contains seven main sections:
       "type": "component-type",
       "tracked_vars": [{ "<variableName>": "<dataType>" }],
       "inherited_args": [{ "<argumentName>": "<argType>" }],
+      "getters": ["derived-property-name"],
       "actions": ["frontend-action", { "backend-action": ["custom/path/file.php"] }],
+      "functions": ["internal-method"],
       "helpers": ["helper1", "helper2"],
       "modifiers": ["modifier1"],
       "services": ["service1", "service2"]
@@ -472,6 +485,7 @@ The storylang.json file contains seven main sections:
   ]
 }
 ```
+
 
 **Example**:
 
@@ -487,6 +501,7 @@ The storylang.json file contains seven main sections:
         { "onEdit": "action" },
         { "onDelete": "action" }
       ],
+      "getters": ["trust-score-color", "display-label"],
       "actions": ["toggle-selection", "expand-details", { "save-file": ["custom/files/save.php"] }, { "delete-file": ["custom/files/delete.php"] }],
       "helpers": ["formatDate", "truncateText"],
       "modifiers": ["tooltip"],
