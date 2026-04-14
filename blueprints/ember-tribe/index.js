@@ -27,7 +27,6 @@ module.exports = {
         { name: 'ember-web-app' },
         { name: 'tracked-built-ins' },
         { name: 'ember-keyboard' },
-        { name: 'ember-router-scroll' },
         { name: 'ember-concurrency' },
         { name: 'ember-table' },
         { name: 'ember-animated' },
