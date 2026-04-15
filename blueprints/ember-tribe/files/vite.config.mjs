@@ -1,9 +1,17 @@
 import { defineConfig } from 'vite';
+import { extensions, classicEmberSupport, ember } from '@embroider/vite';
+import { babel } from '@rollup/plugin-babel';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
   plugins: [
-    // ...your other Ember/Vite plugins
+    classicEmberSupport(),
+    ember(),
+    // extra plugins here
+    babel({
+      babelHelpers: 'runtime',
+      extensions,
+    }),
 
     VitePWA({
       registerType: 'autoUpdate',
@@ -37,7 +45,6 @@ export default defineConfig({
       devOptions: {
         enabled: true,
       },
-    })
-  ]
-})
-
+    }),
+  ],
+});
