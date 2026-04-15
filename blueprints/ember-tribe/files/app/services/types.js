@@ -3,53 +3,40 @@ import ENV from '<%= dasherizedPackageName %>/config/environment';
 import { service } from '@ember/service';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
-import Model, { attr } from '@ember-data/model';
-import { getOwner } from '@ember/application';
 
 export default class TypesService extends Service {
   @service store;
-  @tracked json = this.store.peekRecord('webapp', 0, {
-    include: ['total_objects'],
-  });
+  @tracked json = null;
+  @tracked simplifiedJson = null;
 
   @action
   async fetchAgain() {
     if (ENV.TribeENV.API_URL !== undefined && ENV.TribeENV.API_URL != '') {
+      // First fetch — get the webapp blueprint (no includes yet)
       this.json = await this.store.findRecord('webapp', 0, {});
-      let owner = getOwner(this);
 
-      Object.entries(this.json.modules).forEach(([modelName, modelData]) => {
-        const modelDynamicName = modelName.replace(/_/g, '-');
+      // Feed the blueprint into the store so it knows every type's schema
+      this.store.loadBlueprint(this.json);
 
-        class DynamicModel extends Model {
-          @attr slug;
-          @attr modules;
-        }
-
-        if (!owner.hasRegistration(`model:${modelDynamicName}`)) {
-          owner.register(`model:${modelDynamicName}`, DynamicModel);
-        }
-      });
-
+      // Second fetch — now with total_objects included
       this.json = await this.store.findRecord('webapp', 0, {
-        include: ['total_objects'],
+        include: 'total_objects',
       });
-      this.json = this.json;
+
+      // Re-load blueprint with the enriched response
+      this.store.loadBlueprint(this.json);
+
       this.simplifiedJson = this.convertTypesToSimplified(this.json);
-      //console.log(this.simplifiedJson);
     }
   }
 
   convertTypesToSimplified = (typesJson) => {
-    // Create the basic structure with a types object
     const simplifiedTypes = {
-      project_description: typesJson.modules.webapp.project_description ?? "",
+      project_description: typesJson.modules?.webapp?.project_description ?? '',
       types: {},
     };
 
-    // Iterate through each content type in the original file
-    for (const [typeSlug, typeData] of Object.entries(typesJson.modules)) {
-      // Skip the webapp info and any types without modules
+    for (const [typeSlug, typeData] of Object.entries(typesJson.modules || {})) {
       if (
         typeSlug === 'webapp' ||
         typeSlug === 'deleted_record' ||
@@ -63,36 +50,29 @@ export default class TypesService extends Service {
         continue;
       }
 
-      // Create a new object for this type
       simplifiedTypes.types[typeSlug] = {};
 
-      // Process each module in the content type
       typeData.modules.forEach((module) => {
         const slug = module.input_slug;
-        let varType = (module.var_type ?? "string") + (module.linked_type ? " | *"+module.linked_type : "");
+        let varType =
+          (module.var_type ?? 'string') +
+          (module.linked_type ? ' | *' + module.linked_type : '');
 
-        // Handle select options if they exist
         if (
           module.input_options &&
           Array.isArray(module.input_options) &&
           module.input_options.length > 0
         ) {
-          // Extract all option slugs
-          const optionSlugs = module.input_options.map(
-            (option) => option.slug,
-          );
-
-          // Add the piped extension to the var_type
+          const optionSlugs = module.input_options.map((option) => option.slug);
           if (optionSlugs.length > 0) {
             varType += ` | ${optionSlugs.join(', ')}`;
           }
         }
 
-        // Add the module to the simplified type
         simplifiedTypes.types[typeSlug][slug] = varType;
       });
     }
 
     return simplifiedTypes;
-  }
+  };
 }
