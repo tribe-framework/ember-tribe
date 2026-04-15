@@ -34,7 +34,8 @@ function camelize(str) {
  *   'blogPost' | 'blog-post' | 'blog_post'  →  canonical snake_case 'blog_post'
  */
 function normalizeType(type) {
-  return underscore(type.replace(/-/g, '_'));
+  if (!type) return '';
+  return underscore(String(type).replace(/-/g, '_'));
 }
 
 /**
@@ -445,11 +446,49 @@ export default class StoreService extends Service {
 
   /**
    * Normalise a JSON:API document and push all resources into the cache.
-   * Returns { data: Record | [Record], meta }.
+   * Also handles raw (non-JSON:API) responses from the Tribe API by wrapping
+   * them into a JSON:API resource on the fly.
+   *
+   * @param {Object}  payload       The parsed JSON body from the server.
+   * @param {string}  [contextType] The model type the caller requested (used
+   *                                to wrap raw responses that lack a `data` key).
+   * @param {string}  [contextId]   The id the caller requested.
+   * @returns {{ data: Record|Record[]|null, meta: Object }}
    */
-  _normalizeAndPush(payload) {
+  _normalizeAndPush(payload, contextType, contextId) {
     if (!payload) return { data: null, meta: {} };
 
+    // -------------------------------------------------------------------
+    // Detect whether this is a JSON:API envelope or a raw Tribe response.
+    // JSON:API always has a top-level `data` key (object or array).
+    // If it's missing, treat the entire payload as a single raw resource.
+    // -------------------------------------------------------------------
+    if (!('data' in payload)) {
+      // Raw response — wrap it into JSON:API shape.
+      // `contextType` tells us what type was requested.
+      if (!contextType) {
+        // If we truly don't know the type, return the raw object as attributes
+        // on a best-effort basis.
+        return { data: payload, meta: payload.meta || {} };
+      }
+
+      const id = contextId ?? payload.id ?? payload.slug ?? '0';
+      const { id: _discardId, meta, ...attrs } = payload;
+
+      const wrapped = {
+        data: {
+          id: String(id),
+          type: normalizeType(contextType),
+          attributes: attrs,
+        },
+        meta: meta || {},
+      };
+      return this._normalizeAndPush(wrapped, contextType, contextId);
+    }
+
+    // -------------------------------------------------------------------
+    // Standard JSON:API path
+    // -------------------------------------------------------------------
     const meta = payload.meta || {};
 
     // Side-load included resources first
@@ -459,8 +498,15 @@ export default class StoreService extends Service {
 
     let data;
     if (Array.isArray(payload.data)) {
-      data = payload.data.map((r) => this._pushResource(r));
-    } else if (payload.data) {
+      data = payload.data
+        .filter((r) => r && r.type)           // skip malformed entries
+        .map((r) => this._pushResource(r));
+    } else if (payload.data && payload.data.type) {
+      data = this._pushResource(payload.data);
+    } else if (payload.data && contextType) {
+      // `data` exists but has no `type` — inject it from context
+      payload.data.type = normalizeType(contextType);
+      if (!payload.data.id && contextId != null) payload.data.id = String(contextId);
       data = this._pushResource(payload.data);
     } else {
       data = null;
@@ -602,7 +648,7 @@ export default class StoreService extends Service {
     const payload = this._serialise(record);
     const json = await this._fetch(url, { method: 'POST', body: JSON.stringify(payload) });
     if (json) {
-      const { data } = this._normalizeAndPush(json);
+      const { data } = this._normalizeAndPush(json, record._type);
       // The server may assign an id
       if (data && data._id) {
         // Re-key in cache
@@ -621,7 +667,7 @@ export default class StoreService extends Service {
     const url = this._urlForRecord(record._type, record._id);
     const payload = this._serialise(record);
     const json = await this._fetch(url, { method: 'PATCH', body: JSON.stringify(payload) });
-    if (json) this._normalizeAndPush(json);
+    if (json) this._normalizeAndPush(json, record._type, record._id);
   }
 
   async _deleteRemote(record) {
@@ -642,7 +688,7 @@ export default class StoreService extends Service {
     const params = this._buildQueryParams(options);
     if (params) url += `?${params}`;
     const json = await this._fetch(url);
-    const { data, meta } = this._normalizeAndPush(json);
+    const { data, meta } = this._normalizeAndPush(json, type, id);
     if (meta) this._meta.set(normalizeType(type), meta);
     return data;
   }
@@ -663,7 +709,7 @@ export default class StoreService extends Service {
     const params = this._buildQueryParams(options);
     if (params) url += `?${params}`;
     const json = await this._fetch(url);
-    const { data, meta } = this._normalizeAndPush(json);
+    const { data, meta } = this._normalizeAndPush(json, type);
     const records = Array.isArray(data) ? data : data ? [data] : [];
     // Update or create live array
     const nType = normalizeType(type);
@@ -698,7 +744,7 @@ export default class StoreService extends Service {
     const qs = this._buildQueryParams(params);
     if (qs) url += `?${qs}`;
     const json = await this._fetch(url);
-    const { data, meta } = this._normalizeAndPush(json);
+    const { data, meta } = this._normalizeAndPush(json, type);
     const records = Array.isArray(data) ? data : data ? [data] : [];
     return new RecordArray(records, meta);
   }
@@ -711,7 +757,7 @@ export default class StoreService extends Service {
     const qs = this._buildQueryParams(params);
     if (qs) url += `?${qs}`;
     const json = await this._fetch(url);
-    const { data, meta } = this._normalizeAndPush(json);
+    const { data, meta } = this._normalizeAndPush(json, type);
     if (Array.isArray(data)) return data[0] || null;
     return data;
   }
