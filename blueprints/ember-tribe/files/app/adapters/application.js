@@ -1,4 +1,4 @@
-import JSONAPIAdapter from '@ember-data/adapter/json-api';
+import { JSONAPIAdapter } from '@warp-drive/legacy/adapter/json-api';
 import ENV from '<%= dasherizedPackageName %>/config/environment';
 import { underscore } from '@ember/string';
 

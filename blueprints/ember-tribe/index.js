@@ -47,7 +47,7 @@ module.exports = {
           { name: 'ember-promise-helpers' },
           { name: 'ember-tag-input' },
           { name: 'ember-file-upload' },
-          { name: 'ember-toggle' },
+          { name: 'ember-data' },
           { name: 'ember-basic-dropdown' },
           { name: 'ember-power-select' },
           { name: 'ember-click-outside' },
