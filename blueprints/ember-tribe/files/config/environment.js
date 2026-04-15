@@ -1,8 +1,9 @@
 'use strict';
+require('dotenv').config()
 
 module.exports = function (environment) {
   const ENV = {
-    modulePrefix: 'dummy',
+    modulePrefix: 'new',
     environment,
     rootURL: '/',
     locationType: 'history',
@@ -17,6 +18,11 @@ module.exports = function (environment) {
     APP: {
       // Here you can pass flags/options to your application instance
       // when it is created
+    },
+
+    TribeENV: {
+      API_URL: process.env.TRIBE_API_URL,
+      API_KEY: process.env.TRIBE_API_KEY,
     },
   };
 

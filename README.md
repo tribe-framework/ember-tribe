@@ -64,9 +64,9 @@ ember install ember-tribe
 
 The addon automatically configures following essential packages:
 
-**Ember Addons:** `ember-cli-dotenv`, `ember-cli-sass`, `ember-modifier`, `ember-composable-helpers`, `ember-truth-helpers`, `ember-file-upload` , `ember-power-select`
+**Ember Addons:** `ember-modifier`, `ember-composable-helpers`, `ember-truth-helpers`, `ember-file-upload` , `ember-power-select`
 
-**NPM Packages:** `bootstrap`, `@popperjs/core`, `animate.css`, `video.js`, `swiper`,  `howler`, `sortablejs`, `papaparse`
+**NPM Packages:** `bootstrap`, `@popperjs/core`, `animate.css`, `video.js`, `swiper`, `howler`, `sortablejs`, `papaparse`
 
 **Built-in features that can be used in routes and components**:
 
@@ -146,7 +146,7 @@ Always begin by understanding your data types, then define the routes that load 
 **Types**
 
 8. **Start by Understanding Your Data**
-    Before writing any code, read the project description and `types.json` to understand the data model. Every architectural decision that follows — which routes to create, which services to build, whether components are even needed — depends on a clear understanding of the underlying types.
+   Before writing any code, read the project description and `types.json` to understand the data model. Every architectural decision that follows — which routes to create, which services to build, whether components are even needed — depends on a clear understanding of the underlying types.
 
 ---
 
@@ -156,7 +156,7 @@ Always begin by understanding your data types, then define the routes that load 
    Match route names to user mental models. Use consistent, predictable naming conventions so that routes are self-documenting.
 
 10. **Routes Are for Fetching, Not Logic**
-   Routes should primarily perform read/fetch operations and pass data down to components or services. Keep JavaScript in routes to a minimum — business logic belongs in components and services, not routes.
+    Routes should primarily perform read/fetch operations and pass data down to components or services. Keep JavaScript in routes to a minimum — business logic belongs in components and services, not routes.
 
 11. **Route Parameters**
     Keep `get_vars` minimal and meaningful. Load only the data types that each specific route actually needs — avoid over-fetching.
@@ -270,7 +270,6 @@ The storylang.json file contains seven main sections:
 }
 ```
 
-
 #### Section Definitions
 
 #### 1. Types
@@ -284,7 +283,8 @@ The storylang.json file contains seven main sections:
   "types": [
     {
       "slug": "type-slug", //type slug as defined in `types.json` blueprint
-      "used_in": { //where this type is used
+      "used_in": {
+        //where this type is used
         "routes": ["route-name"],
         "components": ["component-name"],
         "services": ["service-name"],
@@ -314,7 +314,10 @@ The storylang.json file contains seven main sections:
       "tracked_vars": [{ "<variableName>": "<dataType>" }],
       "get_vars": [{ "<paramName>": "<dataType>" }],
       "getters": ["derived-property-name"],
-      "actions": ["frontend-action", { "backend-action": ["custom/path/file.php"] }],
+      "actions": [
+        "frontend-action",
+        { "backend-action": ["custom/path/file.php"] }
+      ],
       "functions": ["helper-method", "compute-something"],
       "helpers": ["helper1"],
       "services": ["service1"],
@@ -426,7 +429,10 @@ The storylang.json file contains seven main sections:
       "name": "service-name",
       "tracked_vars": [{ "<variableName>": "<dataType>" }],
       "getters": ["derived-property-name"],
-      "actions": ["frontend-action", { "backend-action": ["custom/path/file.php"] }],
+      "actions": [
+        "frontend-action",
+        { "backend-action": ["custom/path/file.php"] }
+      ],
       "functions": ["internal-method"],
       "helpers": ["helper1"],
       "services": ["dependency1", "dependency2"]
@@ -449,7 +455,11 @@ The storylang.json file contains seven main sections:
       "functions": ["build-visualization"],
       "actions": [
         "reset-state",
-        { "assemble-data-for-visualization": ["custom/visualizations/assemble-data.php"] },
+        {
+          "assemble-data-for-visualization": [
+            "custom/visualizations/assemble-data.php"
+          ]
+        },
         "updateVisualization"
       ],
       "helpers": ["validateConfig", "generatePreview"],
@@ -476,7 +486,10 @@ The storylang.json file contains seven main sections:
       "tracked_vars": [{ "<variableName>": "<dataType>" }],
       "inherited_args": [{ "<argumentName>": "<argType>" }],
       "getters": ["derived-property-name"],
-      "actions": ["frontend-action", { "backend-action": ["custom/path/file.php"] }],
+      "actions": [
+        "frontend-action",
+        { "backend-action": ["custom/path/file.php"] }
+      ],
       "functions": ["internal-method"],
       "helpers": ["helper1", "helper2"],
       "modifiers": ["modifier1"],
@@ -485,7 +498,6 @@ The storylang.json file contains seven main sections:
   ]
 }
 ```
-
 
 **Example**:
 
@@ -502,7 +514,12 @@ The storylang.json file contains seven main sections:
         { "onDelete": "action" }
       ],
       "getters": ["trust-score-color", "display-label"],
-      "actions": ["toggle-selection", "expand-details", { "save-file": ["custom/files/save.php"] }, { "delete-file": ["custom/files/delete.php"] }],
+      "actions": [
+        "toggle-selection",
+        "expand-details",
+        { "save-file": ["custom/files/save.php"] },
+        { "delete-file": ["custom/files/delete.php"] }
+      ],
       "helpers": ["formatDate", "truncateText"],
       "modifiers": ["tooltip"],
       "services": ["store", "router"]
@@ -681,7 +698,7 @@ When querying records, `modules` and `filter` serve distinct purposes that map d
 
 **`modules`** applies **AND** logic: every key-value pair in the object must match for a record to be included. Use this when you want to narrow results to records that simultaneously satisfy all of the given conditions — for example, posts that are both `published` and belong to a specific `author_id`.
 
-**`filter`** applies **OR** logic: a record is included if it matches *any* of the key-value pairs. Use this when you want to broaden results across multiple values of a field — for example, items whose `category` is either `tech` or `design`.
+**`filter`** applies **OR** logic: a record is included if it matches _any_ of the key-value pairs. Use this when you want to broaden results across multiple values of a field — for example, items whose `category` is either `tech` or `design`.
 
 The two can be combined in the same query. For instance, to find all published posts that are tagged as either `news` or `feature`:
 
@@ -990,11 +1007,17 @@ import Service from '@ember/service';
 export default class ShoppingCartService extends Service {
   items = new TrackedArray([]);
 
-  add(item) { this.items.push(item) }
+  add(item) {
+    this.items.push(item);
+  }
 
-  remove(item) { this.items.splice(this.items.indexOf(item), 1) }
+  remove(item) {
+    this.items.splice(this.items.indexOf(item), 1);
+  }
 
-  empty() { this.items.splice(0, this.items.length) }
+  empty() {
+    this.items.splice(0, this.items.length);
+  }
 }
 ```
 
@@ -1109,16 +1132,16 @@ async uploadFile(file) {
 Use Ember's built-in `<Input>` component instead of a raw `<input>` tag — it automatically updates bound state via `@value`.
 
 ```handlebars
-<div class="mb-3">
-  <label for="input-name" class="form-label">Name:</label>
+<div class='mb-3'>
+  <label for='input-name' class='form-label'>Name:</label>
   <Input
-    id="input-name"
-    class="form-control"
-    @type="text"
+    id='input-name'
+    class='form-control'
+    @type='text'
     @value={{this.name}}
     disabled={{this.isReadOnly}}
-    maxlength="50"
-    placeholder="Enter your name"
+    maxlength='50'
+    placeholder='Enter your name'
   />
 </div>
 ```
@@ -1134,31 +1157,32 @@ export default class ExampleComponent extends Component {
 ```
 
 ```handlebars
-<div class="form-check mb-3">
+<div class='form-check mb-3'>
   <Input
-    id="admin-checkbox"
-    class="form-check-input"
-    @type="checkbox"
+    id='admin-checkbox'
+    class='form-check-input'
+    @type='checkbox'
     @checked={{this.isAdmin}}
-    {{on "input" this.validateRole}}
+    {{on 'input' this.validateRole}}
   />
-  <label for="admin-checkbox" class="form-check-label">Is Admin?</label>
+  <label for='admin-checkbox' class='form-check-label'>Is Admin?</label>
 </div>
 ```
 
 ```handlebars
-<div class="mb-3">
-  <label for="user-comment" class="form-label">Comment:</label>
+<div class='mb-3'>
+  <label for='user-comment' class='form-label'>Comment:</label>
   <Textarea
-    id="user-comment"
-    class="form-control"
+    id='user-comment'
+    class='form-control'
     @value={{this.userComment}}
-    rows="6"
+    rows='6'
   />
 </div>
 ```
 
 **Key rules for `<Input>` and `<Textarea>`:**
+
 - `@value`, `@type`, and `@checked` must be passed as **arguments** (with `@`).
 - Use the `{{on}}` modifier for event handling (e.g. `{{on "input" this.handler}}`).
 - Bootstrap styles `form-control` correctly when `disabled` is present
@@ -1170,14 +1194,14 @@ export default class ExampleComponent extends Component {
 **Single select (Bootstrap-compatible wrapper):**
 
 ```handlebars
-<div class="mb-3">
-  <label class="form-label">Assign Category:</label>
-  <div class="form-control p-0 border-0">
+<div class='mb-3'>
+  <label class='form-label'>Assign Category:</label>
+  <div class='form-control p-0 border-0'>
     <PowerSelect
       @options={{this.categories}}
       @selected={{this.selectedCategory}}
       @onChange={{this.handleCategoryChange}}
-      @placeholder="Select a category"
+      @placeholder='Select a category'
       as |category|
     >
       {{category.name}}
@@ -1210,14 +1234,14 @@ export default class ExampleComponent extends Component {
 **Multi-select variant:**
 
 ```handlebars
-<div class="mb-3">
-  <label class="form-label">Assign Tags:</label>
-  <div class="form-control p-0 border-0">
+<div class='mb-3'>
+  <label class='form-label'>Assign Tags:</label>
+  <div class='form-control p-0 border-0'>
     <PowerSelectMultiple
       @options={{this.availableTags}}
       @selected={{this.selectedTags}}
       @onChange={{this.handleTagsChange}}
-      @placeholder="Select tags"
+      @placeholder='Select tags'
       as |tag|
     >
       {{tag.label}}
@@ -1229,15 +1253,15 @@ export default class ExampleComponent extends Component {
 **Async options loaded from the store:**
 
 ```handlebars
-<div class="mb-3">
-  <label class="form-label">Select Project:</label>
-  <div class="form-control p-0 border-0">
+<div class='mb-3'>
+  <label class='form-label'>Select Project:</label>
+  <div class='form-control p-0 border-0'>
     <PowerSelect
       @options={{this.projects}}
       @selected={{this.selectedProject}}
       @onChange={{this.handleProjectChange}}
-      @searchField="name"
-      @placeholder="Search projects..."
+      @searchField='name'
+      @placeholder='Search projects...'
       as |project|
     >
       {{project.modules.name}}
@@ -1247,6 +1271,7 @@ export default class ExampleComponent extends Component {
 ```
 
 **Key rules for `<PowerSelect>`:**
+
 - `@options`, `@selected`, and `@onChange` are always required arguments.
 - Use `@searchField` to specify which object property drives the built-in search filter.
 - For multi-select, use `<PowerSelectMultiple>` — the `@onChange` callback receives the full updated array, so assign it directly to your tracked property.
