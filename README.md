@@ -64,7 +64,7 @@ ember install ember-tribe
 
 The addon automatically configures following essential packages:
 
-**Ember Addons:** `ember-modifier`, `ember-composable-helpers`, `ember-truth-helpers`, `ember-file-upload` , `ember-power-select`
+**Ember Addons:** `ember-cli-dotenv`, `ember-cli-sass`, `ember-modifier`, `ember-composable-helpers`, `ember-truth-helpers`, `ember-file-upload` , `ember-power-select`
 
 **NPM Packages:** `bootstrap`, `@popperjs/core`, `animate.css`, `video.js`, `swiper`, `howler`, `sortablejs`, `papaparse`
 
@@ -94,7 +94,7 @@ app/
 ├── services/
 ├── styles/app.scss
 └── router.js
-config/
+public/
 └── storylang.json
 installer.sh
 ```
@@ -217,7 +217,7 @@ Always begin by understanding your data types, then define the routes that load 
 
 ### Storylang CLI
 
-ember-tribe ships with a command-line tool called `storylang` that synchronises the `config/storylang.json` specification with the actual Ember project files.
+ember-tribe ships with a command-line tool called `storylang` that synchronises the `public/storylang.json` specification with the actual Ember project files.
 
 #### Usage
 
@@ -225,7 +225,7 @@ ember-tribe ships with a command-line tool called `storylang` that synchronises 
 node storylang
 ```
 
-Scans the current Ember project and writes/updates `config/storylang.json` from the actual files that exist in the `app/` directory.
+Scans the current Ember project and writes/updates `public/storylang.json` from the actual files that exist in the `app/` directory.
 
 **Example:**
 
@@ -233,12 +233,12 @@ Scans the current Ember project and writes/updates `config/storylang.json` from 
 cd /path/to/ember/app
 
 node storylang
-# => config/storylang.json updated from project files
+# => public/storylang.json updated from project files
 ```
 
 #### Typical Workflow
 
-Run `node storylang` periodically to keep `config/storylang.json` in sync as the project evolves.
+Run `node storylang` periodically to keep `public/storylang.json` in sync as the project evolves.
 
 ---
 
@@ -246,7 +246,7 @@ Run `node storylang` periodically to keep `config/storylang.json` in sync as the
 
 #### Overview
 
-Storylang.json is a structured configuration file used in the ember-tribe ecosystem to define the frontend implementation of your application. It is found at `config/storylang.json`. It works in conjunction with your `types.json` (which defines your data types) to create a complete frontend specification.
+Storylang.json is a structured configuration file used in the ember-tribe ecosystem to define the frontend implementation of your application. It is found at `public/storylang.json`. It works in conjunction with your `types.json` (which defines your data types) to create a complete frontend specification.
 
 #### Purpose
 
