@@ -1,0 +1,64 @@
+{{#if (eq @block.type "paragraph")}}
+	<p>{{{@block.data.text}}}</p>
+
+{{else if (eq @block.type "header")}}
+	<h1 class="display-6">{{{@block.data.text}}}</h1>
+
+{{else if (eq @block.type "list")}}
+	{{#if (eq @block.data.style "unordered")}}
+		<ul>
+			{{#each @block.data.items as |item|}}
+				<li>{{{item}}}</li>
+			{{/each}}
+		</ul>
+	{{else}}
+		<ol>
+			{{#each @block.data.items as |item|}}
+				<li>{{{item}}}</li>
+			{{/each}}
+		</ol>
+	{{/if}}
+
+{{else if (eq @block.type "table")}}
+	<table class="table mb-4">
+		{{#each @block.data.content as |row index|}}
+			{{#if (and @block.data.withHeadings (eq index 0))}}
+				<thead><tr>
+					{{#each row as |cell|}}
+						<th scope="col">{{cell}}</th>
+					{{/each}}
+				</tr></thead>
+			{{/if}}
+		{{/each}}
+		{{#each @block.data.content as |row index|}}
+			<tbody>
+			{{#unless (and @block.data.withHeadings (eq index 0))}}
+				<tr>
+					{{#each row as |cell index|}}
+						{{#if (and @block.data.withHeadings (eq index 0))}}
+							<th scope="row">{{cell}}</th>
+						{{else}}
+							<td>{{cell}}</td>
+						{{/if}}
+					{{/each}}
+				</tr>
+			{{/unless}}
+			</tbody>
+		{{/each}}
+	</table>
+
+{{else if (eq @block.type "quote")}}
+	<blockquote class="my-5 fst-italic display-6 lh-lg fs-4 border-start border-5 border-secondary text-secondary ps-3">{{{@block.data.text}}}</blockquote>
+
+{{else if (eq @block.type "image")}}
+    <figure id={{@block.id}} class="mb-3">
+      <img src={{@block.data.file.url}} class="image-fluid" />
+      {{#if @block.data.caption}}
+        <figcaption class="small text-muted mt-2 col-lg-10 me-0 ms-auto">{{{@block.data.caption}}}</figcaption>
+      {{/if}}
+    </figure>
+
+{{else if (eq @block.type "raw")}}
+	<div id={{@block.id}} class="w-100 mb-2 editorjs-raw-html">{{{@block.data.html}}}</div>
+
+{{/if}}
