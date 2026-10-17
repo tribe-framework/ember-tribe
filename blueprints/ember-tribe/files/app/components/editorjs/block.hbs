@@ -2,7 +2,7 @@
 	<p>{{{@block.data.text}}}</p>
 
 {{else if (eq @block.type "header")}}
-	<h1 class="display-6">{{{@block.data.text}}}</h1>
+	<h5>{{{@block.data.text}}}</h5>
 
 {{else if (eq @block.type "list")}}
 	{{#if (eq @block.data.style "unordered")}}
