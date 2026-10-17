@@ -8,7 +8,6 @@ module.exports = {
       packages: [
         { name: 'ember-cli-dotenv' },
         { name: 'ember-cli-sass' },
-        { name: 'ember-cli-favicon' },
         { name: '@ember/optional-features' },
         { name: 'ember-modifier' },
         { name: 'ember-composable-helpers' },
