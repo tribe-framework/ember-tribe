@@ -22,6 +22,7 @@ Tribe is a project management framework built for ease of collaboration - https:
     - [Components](#components)
 - [Storylang](#storylang)
   - [Storylang CLI](#storylang-cli)
+  - [Storylang Viewer](#storylang-viewer)
   - [Storylang.json Documentation](#storylangjson-documentation)
     - [Types](#1-types)
     - [Routes](#2-routes)
@@ -40,6 +41,7 @@ Tribe is a project management framework built for ease of collaboration - https:
     - [Services Integration](#services-integration)
     - [Component Architecture](#component-architecture)
     - [Forms and Input Fields](#forms-and-input-fields)
+    - [Rendering Editor.js Content](#rendering-editorjs-content)
   - [Deploying to Junction (Self-Hosted)](#deploying-to-junction-self-hosted)
 
 ---
@@ -48,7 +50,7 @@ Tribe is a project management framework built for ease of collaboration - https:
 
 ### Prerequisites
 
-- Ember CLI v6.0 – v6.4
+- Ember CLI v7.x (Vite + Embroider app blueprint)
 - Node.js (latest LTS)
 - Junction (optional) - via https://junction.express (cloud version) or https://tribe-framework.org (open source version)
 
@@ -64,9 +66,9 @@ ember install ember-tribe
 
 The addon automatically configures following essential packages:
 
-**Ember Addons:** `ember-cli-dotenv`, `ember-cli-sass`, `ember-modifier`, `ember-composable-helpers`, `ember-truth-helpers`, `ember-file-upload` , `ember-power-select`
+**Ember Addons:** `ember-modifier`, `@nullvoxpopuli/ember-composable-helpers`, `ember-truth-helpers`, `ember-svg-jar`, `ember-math-helpers`, `ember-cli-string-helpers`, `ember-file-upload`, `ember-basic-dropdown`, `ember-power-select`, `ember-click-outside`, `tracked-built-ins`, `ember-keyboard`, `ember-concurrency`, `ember-animated`
 
-**NPM Packages:** `bootstrap`, `@popperjs/core`, `animate.css`, `video.js`, `swiper`, `howler`, `sortablejs`, `papaparse`
+**NPM Packages:** `dotenv`, `sass`, `bootstrap`, `@popperjs/core`, `animate.css`, `video.js`, `swiper`, `howler`, `ripplet.js`, `@ember/string`, `@editorjs/editorjs` (with `image`, `header`, `raw`, `code`, `marker`, `delimiter`, `quote`, `list`, `attaches`, `footnotes`, `table` tools), `editorjs-hyperlink`, `miragejs`, `papaparse`, `sortablejs`, `highlight.js`, `uuid`, `pretty-print-json`
 
 **Built-in features that can be used in routes and components**:
 
@@ -75,9 +77,14 @@ The addon automatically configures following essential packages:
 
 **Preinstalled services in ember-tribe**:
 
-- `store`: Ember Data store for CRUD operations
+- `store`: WarpDrive legacy store (`useLegacyStore` from `@warp-drive/legacy`) for CRUD operations
 - `router`: Ember router service for navigation
 - `types`: Automatic model generation from backend tracks
+- `cookies`: `setCookie`, `getCookie` and `eraseCookie` actions
+
+**Preinstalled components**: `editorjs` (renders Editor.js JSON), `storylang` (visualises `public/storylang.json`)
+
+**Preinstalled modifiers**: `did-insert`, `set-style`
 
 ---
 
@@ -85,6 +92,9 @@ The addon automatically configures following essential packages:
 
 ```
 app/
+├── adapters/application.js
+├── serializers/application.js
+├── models/webapp.js
 ├── routes/
 ├── templates/
 ├── controllers/
@@ -93,11 +103,24 @@ app/
 ├── modifiers/
 ├── services/
 ├── styles/app.scss
+├── app.js
 └── router.js
 public/
-└── storylang.json
+├── storylang.json
+├── _init.php
+├── _head.php
+├── _head_footer.php
+├── _body.php
+├── _body_footer.php
+└── composer.json
+index.html
+vite.config.mjs
+storylang
+php-dist
 installer.sh
 ```
+
+Route templates and components are single-file `.gjs` modules.
 
 ---
 
@@ -107,28 +130,31 @@ These rules are **mandatory** for all Tribe-compatible code. Follow them strictl
 
 ### Code Rules
 
-1. **EmberJS 6.x Compatibility — Strictly Required**
-   All generated code must be strictly compatible with EmberJS 6.x.
+1. **EmberJS 7.x Compatibility — Strictly Required**
+   All generated code must be strictly compatible with EmberJS 7.x, built with Vite and Embroider.
 
-2. **Bootstrap 5.x — Required Foundation**
+2. **Template Tag Format (`.gjs`) — Required**
+   Write every component and route template as a `.gjs` file using `<template>` tags. Do not create `.hbs` files. Import every component, helper and modifier used in a template explicitly at the top of the file.
+
+3. **Bootstrap 5.x — Required Foundation**
    Use Bootstrap 5.x as the sole design system for all layout, spacing, and responsive behaviour. Do not introduce custom CSS frameworks or utility libraries that conflict with Bootstrap. Follow Bootstrap conventions strictly.
 
-3. **Backend Field Access**
+4. **Backend Field Access**
    Always access backend fields through the `modules` object — e.g. `object.modules.field_name`. Never access backend fields directly.
 
-4. **npm Packages over Ember Addons**
+5. **npm Packages over Ember Addons**
    When an npm package and an Ember addon offer equivalent functionality, always prefer the npm package for better long-term compatibility.
 
-5. **Icons — FontAwesome 6.x Only**
-   Use FontAwesome 6.x for all icons. Do not use any other icon library unless the project description explicitly specifies one.
+6. **Icons — FontAwesome 7.x Only**
+   Use FontAwesome 7.x for all icons. It is loaded from CDN in `index.html`. Do not use any other icon library unless the project description explicitly specifies one.
 
-6. **Animations — Subtle and Purposeful**
+7. **Animations — Subtle and Purposeful**
    If animations are needed, use `animate.css`. Keep animations subtle — prefer fades and minimal slides. Avoid anything that feels flashy or distracting.
 
-7. **EmberData Caching**
+8. **EmberData Caching**
    When data has already been loaded into the store, retrieve it with `peekRecord` instead of making a new network request.
 
-8. **Backend Filtering over Frontend Filtering**
+9. **Backend Filtering over Frontend Filtering**
    For sorting and filtering data, always use `this.store.query` with backend query parameters. Do not filter or sort arrays on the frontend when the backend can do it.
 
 ---
@@ -145,70 +171,70 @@ Always begin by understanding your data types, then define the routes that load 
 
 **Types**
 
-8. **Start by Understanding Your Data**
-   Before writing any code, read the project description and `types.json` to understand the data model. Every architectural decision that follows — which routes to create, which services to build, whether components are even needed — depends on a clear understanding of the underlying types.
+10. **Start by Understanding Your Data**
+    Before writing any code, read the project description and `types.json` to understand the data model. Every architectural decision that follows — which routes to create, which services to build, whether components are even needed — depends on a clear understanding of the underlying types.
 
 ---
 
 **Routes**
 
-9. **Route Naming**
-   Match route names to user mental models. Use consistent, predictable naming conventions so that routes are self-documenting.
+11. **Route Naming**
+    Match route names to user mental models. Use consistent, predictable naming conventions so that routes are self-documenting.
 
-10. **Routes Are for Fetching, Not Logic**
+12. **Routes Are for Fetching, Not Logic**
     Routes should primarily perform read/fetch operations and pass data down to components or services. Keep JavaScript in routes to a minimum — business logic belongs in components and services, not routes.
 
-11. **Route Parameters**
+13. **Route Parameters**
     Keep `get_vars` minimal and meaningful. Load only the data types that each specific route actually needs — avoid over-fetching.
 
 ---
 
 **Controllers**
 
-12. **Controllers Bridge Routes and Templates**
+14. **Controllers Bridge Routes and Templates**
     Controllers sit between routes and templates, handling query parameters, user actions, and transient UI state that belongs to a specific route. Keep controllers focused — they are not a place for business logic or data fetching.
 
-13. **Keep Controllers Thin**
+15. **Keep Controllers Thin**
     Delegate complex logic to services. A controller should primarily expose tracked properties and actions that the corresponding template needs directly.
 
 ---
 
 **Helpers**
 
-14. **Helpers Must Be Pure and Stateless**
+16. **Helpers Must Be Pure and Stateless**
     A helper receives input and returns output — nothing else. Helpers must have no side effects and must not interact with the store, services, or DOM.
 
 ---
 
 **Modifiers**
 
-15. **Modifiers Own All DOM Interaction**
+17. **Modifiers Own All DOM Interaction**
     Any direct DOM manipulation or third-party library initialisation must live in a modifier.
 
 ---
 
 **Services**
 
-16. **Services Are the Core Logic Layer**
+18. **Services Are the Core Logic Layer**
     Services hold the primary business logic of the application. They interact with both routes and components and are the single source of truth for app-wide behaviour.
 
-17. **Keep Services Stateless When Possible**
+19. **Keep Services Stateless When Possible**
     Avoid storing transient state in services. Where services must depend on one another, use dependency injection.
 
-18. **All Backend Calls Must Live Inside `@action` Functions**
+20. **All Backend Calls Must Live Inside `@action` Functions**
     Any call to a `/custom/*.php` script must be made from within an `@action` function. This rule makes backend interactions explicit, traceable, and user-initiated by design.
 
-19. **Plain Methods Belong in `functions`, Not `actions`**
+21. **Plain Methods Belong in `functions`, Not `actions`**
     Internal methods, which carry no special Ember semantics, should be traced automatically under the `functions` key in `storylang.json`. Do not decorate them with `@action`. Keeping `actions` reserved for user-facing interactions makes the intent of each method immediately clear to anyone reading the spec.
 
-20. **Getters Are Derived Properties — Not Actions or Functions**
+22. **Getters Are Derived Properties — Not Actions or Functions**
     Native JavaScript `get` accessors (e.g. `get trustScoreColor()`) derive a display value, CSS class, or conditional flag from `this.args` or other state. They carry no side effects and require no `@action` decorator. Storylang captures them under the `getters` key, separate from `actions` and `functions`, so the distinction between user-facing interactions, internal logic, and pure derived state is always explicit in the spec.
 
 ---
 
 **Components**
 
-21. **Components are not always required**
+23. **Components are not always required**
     Before creating components, assess the scale of the project from its description. On small projects, fewer files means higher code readability — collapsing template logic directly into route templates is often the right call. On larger projects, the opposite is true: extracting repeatable UI into named components improves clarity, maintainability, and testability. Make this decision deliberately at the start, not as an afterthought.
 
 ---
@@ -225,7 +251,7 @@ ember-tribe ships with a command-line tool called `storylang` that synchronises 
 node storylang
 ```
 
-Scans the current Ember project and writes/updates `public/storylang.json` from the actual files that exist in the `app/` directory.
+Scans the current Ember project and writes/updates `public/storylang.json` from the actual files that exist in the `app/` directory. It reads `.gjs`, `.gts`, `.js` and `.ts` files, splits `<template>` blocks from their JavaScript, and resolves imported helpers, modifiers and components back to their slugs.
 
 **Example:**
 
@@ -236,9 +262,22 @@ node storylang
 # => public/storylang.json updated from project files
 ```
 
+#### Merge Behaviour
+
+- Entries are matched by `slug`. Older entries keyed by `name` are migrated to `slug`.
+- Fields the scanner does not produce, such as `description` and `used_in`, are kept.
+- For `tracked_vars`, `get_vars`, `inherited_args`, `args` and a helper's `return`, a hand-written data type wins over the scanner's guess. The list of names always comes from the scan.
+- Entries with no matching file in `app/` are removed.
+
 #### Typical Workflow
 
 Run `node storylang` periodically to keep `public/storylang.json` in sync as the project evolves.
+
+---
+
+### Storylang Viewer
+
+The `index` route renders the preinstalled `storylang` component, which loads `/storylang.json` and draws an arc diagram of routes, services, types, helpers, modifiers and components. Selecting a node opens its details. Replace `app/templates/index.gjs` when the app needs its own home page.
 
 ---
 
@@ -257,15 +296,15 @@ The storylang.json file serves as a blueprint for frontend developers to underst
 
 #### File Structure
 
-The storylang.json file contains seven main sections:
+The storylang.json file contains six main sections. Every entry is keyed by `slug`:
 
 ```json
 {
-  "types": [...],
   "routes": [...],
+  "services": [...],
+  "types": [...],
   "helpers": [...],
   "modifiers": [...],
-  "services": [...],
   "components": [...]
 }
 ```
@@ -274,7 +313,7 @@ The storylang.json file contains seven main sections:
 
 #### 1. Types
 
-**Purpose**: Declares which data types from `types.json` and maps them to the components, routes, services, helpers and modifiers that consume them. This creates a traceable link between your data layer and your UI implementation.
+**Purpose**: Lists every data type from `types.json` that the app reads or writes through the store, and maps each one to the routes, components, services, helpers and modifiers that consume it. `node storylang` collects the slugs from `findRecord`, `query`, `queryRecord`, `peekRecord`, `createRecord` and similar store calls in routes, controllers, components and services. The `used_in` map is written by hand.
 
 **Format**:
 
@@ -310,7 +349,7 @@ The storylang.json file contains seven main sections:
 {
   "routes": [
     {
-      "name": "route-name", //should match Ember router.js
+      "slug": "route-name", //should match Ember router.js
       "tracked_vars": [{ "<variableName>": "<dataType>" }],
       "get_vars": [{ "<paramName>": "<dataType>" }],
       "getters": ["derived-property-name"],
@@ -321,8 +360,7 @@ The storylang.json file contains seven main sections:
       "functions": ["helper-method", "compute-something"],
       "helpers": ["helper1"],
       "services": ["service1"],
-      "components": ["component1", "component2"],
-      "types": ["type1", "type2"]
+      "components": ["component1", "component2"]
     }
   ]
 }
@@ -342,9 +380,9 @@ The storylang.json file contains seven main sections:
 {
   "helpers": [
     {
-      "name": "helper-name",
+      "slug": "helper-name",
       "description": "What this helper does",
-      "input_args": [{ "<argumentName>": "<dataType>" }],
+      "args": [{ "<argumentName>": "<dataType>" }],
       "return": "<dataType>"
     }
   ]
@@ -357,15 +395,15 @@ The storylang.json file contains seven main sections:
 {
   "helpers": [
     {
-      "name": "format-date",
+      "slug": "format-date",
       "description": "Formats a raw ISO date string into a human-readable date",
-      "input_args": [{ "isoString": "string" }, { "format": "string" }],
+      "args": [{ "date": "string" }, { "format": "string" }],
       "return": "string"
     },
     {
-      "name": "truncate-text",
+      "slug": "truncate-text",
       "description": "Truncates a string to a given character limit and appends an ellipsis",
-      "input_args": [{ "text": "string" }, { "limit": "int" }],
+      "args": [{ "text": "string" }, { "limit": "int" }],
       "return": "string"
     }
   ]
@@ -384,9 +422,9 @@ The storylang.json file contains seven main sections:
 {
   "modifiers": [
     {
-      "name": "modifier-name",
+      "slug": "modifier-name",
       "description": "What DOM behaviour this modifier applies",
-      "input_args": [{ "<argumentName>": "<dataType>" }],
+      "args": [{ "<argumentName>": "<dataType>" }],
       "services": ["service1"]
     }
   ]
@@ -399,16 +437,13 @@ The storylang.json file contains seven main sections:
 {
   "modifiers": [
     {
-      "name": "tooltip",
+      "slug": "tooltip",
       "description": "Initialises a Bootstrap tooltip on the target element using the provided label",
-      "input_args": [{ "label": "string" }, { "placement": "string" }],
-      "services": []
+      "args": [{ "label": "string" }, { "placement": "string" }]
     },
     {
-      "name": "autofocus",
-      "description": "Sets focus on the target element when it is inserted into the DOM",
-      "input_args": [],
-      "services": []
+      "slug": "autofocus",
+      "description": "Sets focus on the target element when it is inserted into the DOM"
     }
   ]
 }
@@ -426,7 +461,7 @@ The storylang.json file contains seven main sections:
 {
   "services": [
     {
-      "name": "service-name",
+      "slug": "service-name",
       "tracked_vars": [{ "<variableName>": "<dataType>" }],
       "getters": ["derived-property-name"],
       "actions": [
@@ -434,7 +469,6 @@ The storylang.json file contains seven main sections:
         { "backend-action": ["custom/path/file.php"] }
       ],
       "functions": ["internal-method"],
-      "helpers": ["helper1"],
       "services": ["dependency1", "dependency2"]
     }
   ]
@@ -447,7 +481,7 @@ The storylang.json file contains seven main sections:
 {
   "services": [
     {
-      "name": "visualization-builder",
+      "slug": "visualization-builder",
       "tracked_vars": [
         { "dataMatrix": "object" },
         { "availableTypes": "array" }
@@ -460,9 +494,8 @@ The storylang.json file contains seven main sections:
             "custom/visualizations/assemble-data.php"
           ]
         },
-        "updateVisualization"
+        "update-visualization"
       ],
-      "helpers": ["validateConfig", "generatePreview"],
       "services": ["store", "router"]
     }
   ]
@@ -473,7 +506,7 @@ The storylang.json file contains seven main sections:
 
 #### 6. Components
 
-**Purpose**: Defines reusable UI components that will be built for the application.
+**Purpose**: Defines reusable UI components that will be built for the application. Nested components use `/` in their slug, e.g. `editorjs/block`.
 
 **Format**:
 
@@ -481,8 +514,7 @@ The storylang.json file contains seven main sections:
 {
   "components": [
     {
-      "name": "component-name",
-      "type": "component-type",
+      "slug": "component-name",
       "tracked_vars": [{ "<variableName>": "<dataType>" }],
       "inherited_args": [{ "<argumentName>": "<argType>" }],
       "getters": ["derived-property-name"],
@@ -505,13 +537,12 @@ The storylang.json file contains seven main sections:
 {
   "components": [
     {
-      "name": "file-summary-card",
-      "type": "card",
+      "slug": "file-summary-card",
       "tracked_vars": [{ "isSelected": "bool" }, { "isExpanded": "bool" }],
       "inherited_args": [
         { "file": "var" },
-        { "onEdit": "action" },
-        { "onDelete": "action" }
+        { "on-edit": "action" },
+        { "on-delete": "action" }
       ],
       "getters": ["trust-score-color", "display-label"],
       "actions": [
@@ -520,7 +551,7 @@ The storylang.json file contains seven main sections:
         { "save-file": ["custom/files/save.php"] },
         { "delete-file": ["custom/files/delete.php"] }
       ],
-      "helpers": ["formatDate", "truncateText"],
+      "helpers": ["format-date", "truncate-text"],
       "modifiers": ["tooltip"],
       "services": ["store", "router"]
     }
@@ -553,7 +584,7 @@ The storylang.json file contains seven main sections:
 
 #### With types.json
 
-- Type names used in routes should match type names from `types.json`
+- Type slugs used in store calls should match type slugs from `types.json`
 - The `types` section in storylang.json is the explicit bridge between your data types and your UI — always keep it in sync with `types.json`
 - Types are the gateway to persistent storage on the backend
 - For a full reference on the `types.json` format and its field definitions, see the official documentation at [https://github.com/tribe-framework/types.json](https://github.com/tribe-framework/types.json)
@@ -573,10 +604,9 @@ Make separate, complete code files for each category:
 ```bash
 npm i chart.js
 npm i lodash
-ember install ember-table
 ember g route files
 ember g controller files
-ember g component file-card -gc
+ember g component file-card --strict
 ember g helper format-date
 ember g modifier tooltip
 ember g service visualization-builder
@@ -584,13 +614,13 @@ ember g service visualization-builder
 
 #### Default styling
 
-Following is the default style that comes with tribe. Use the app.scss file for all style code. Change this based on your design styling requirements.
+Following is the default style that comes with tribe. Use the app.scss file for all style code. Change this based on your design styling requirements. Vite compiles it through `sass`, and `vite.config.mjs` silences Bootstrap's Sass deprecation warnings.
 
 ```app/styles/app.scss
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap");
 
-$font-family-sans-serif: 'IBM Plex Mono', monospace !default;
-$display-font-family: 'IBM Plex Mono', monospace !default;
+$font-family-sans-serif: "IBM Plex Mono", serif !default;
+$display-font-family: "IBM Plex Mono", serif !default;
 
 $primary: #000000 !default;
 $secondary: #cccccc !default;
@@ -620,38 +650,49 @@ $spacers: (
   10: $spacer * 12,
 ) !default;
 
-@import 'node_modules/bootstrap/scss/bootstrap';
-@import 'node_modules/animate.css/animate';
+@import "bootstrap/scss/bootstrap";
+@import "animate.css/animate";
 ```
 
 #### Default application structure
 
-```app/templates/application.hbs
-{{page-title 'Your Application Name'}}
-{{outlet}}
-<BasicDropdownWormhole />
+```app/templates/application.gjs
+import { pageTitle } from 'ember-page-title';
+
+<template>
+  {{pageTitle "Your Application Name"}}
+  {{outlet}}
+</template>
 ```
 
 ```app/routes/application.js
 import Route from '@ember/routing/route';
-import * as bootstrap from 'bootstrap';
+import 'bootstrap';
 import { service } from '@ember/service';
-import { later } from '@ember/runloop';
 import { action } from '@ember/object';
 
 export default class ApplicationRoute extends Route {
   @service types;
 
-  //auto-sync backend types
-  async beforeModel() { await this.types.fetchAgain() }
+  async beforeModel() {
+    await this.types.fetchAgain();
+  }
 
   @action
-  didTransition() { later( this, () => { document.querySelector('#loading').classList.add('d-none') }, 50 ) }
+  didTransition() {
+    setTimeout(() => {
+      document.querySelector('#loading').classList.add('d-none');
+    }, 50);
+  }
 
   @action
-  willTransition() { document.querySelector('#loading').classList.remove('d-none') }
+  willTransition() {
+    document.querySelector('#loading').classList.remove('d-none');
+  }
 }
 ```
+
+The `#loading` overlay lives in `index.html`, next to the FontAwesome 7 CDN links and the web app manifest.
 
 **Application Extension Guidelines:**
 
@@ -664,7 +705,7 @@ export default class ApplicationRoute extends Route {
 
 ### EmberData Integration
 
-ember-tribe automatically generates models from backend track definitions through the `types` service:
+ember-tribe automatically generates models from backend track definitions through the `types` service. On boot, `types.fetchAgain()` requests the `webapp` record and registers one model per type, each with `slug` and `modules` attributes. The application adapter points to `TRIBE_API_URL/api.php` with the `TRIBE_API_KEY` bearer token, and the adapter and serializer convert model names and keys to underscore notation.
 
 #### Data Access Patterns
 
@@ -795,13 +836,23 @@ export default class FilesRoute extends Route {
 }
 ```
 
+```app/templates/files.gjs
+import FileCard from '../components/file-card';
+
+<template>
+  {{#each @model as |file|}}
+    <FileCard @file={{file}} />
+  {{/each}}
+</template>
+```
+
 ---
 
 ### Helper System
 
 #### Global Helpers
 
-Make helpers based on storylang.json helper requirements:
+Make helpers based on storylang.json helper requirements. Keep the `helper(function name([args]) {})` signature so that `node storylang` can read the arguments:
 
 ```javascript
 // app/helpers/format-date.js
@@ -816,10 +867,14 @@ export default helper(function formatDate([date, format = 'short']) {
 
 #### Template Usage
 
-```handlebars
-<span class='text-muted'>
-  {{format-date @post.modules.created_date 'medium'}}
-</span>
+```gjs
+import formatDate from '../helpers/format-date';
+
+<template>
+  <span class="text-muted">
+    {{formatDate @post.modules.created_date "medium"}}
+  </span>
+</template>
 ```
 
 ---
@@ -844,34 +899,43 @@ export default modifier((element, [content]) => {
 });
 ```
 
+```gjs
+import tooltip from '../modifiers/tooltip';
+
+<template>
+  <button type="button" class="btn btn-primary" {{tooltip "Save changes"}}>Save</button>
+</template>
+```
+
 #### Writing Helpers
 
 Helper functions are JavaScript functions callable from Ember templates that perform computations or operations beyond basic template syntax, keeping templates clean while adding dynamic functionality.
 
 **Local Helpers:**
 
-- Defined as methods within component classes
+- Defined as methods within component classes, or as plain functions in the same `.gjs` file
 - Scoped to specific component
-- Called with `this.` prefix in templates
+- Class methods are called with `this.` prefix in templates
 
-```javascript
-// app/components/user-card.js
+```gjs
+// app/components/user-card.gjs
+import Component from '@glimmer/component';
+
 export default class UserCard extends Component {
   formatName = (firstName, lastName) =>
     `${firstName} ${lastName}`.toUpperCase();
-}
-```
 
-```handlebars
-<!-- app/components/user-card.hbs -->
-<h2>{{this.formatName @user.modules.first_name @user.modules.last_name}}</h2>
+  <template>
+    <h2>{{this.formatName @user.modules.first_name @user.modules.last_name}}</h2>
+  </template>
+}
 ```
 
 **Global Helpers:**
 
 - Defined in `app/helpers/` folder as separate files
-- Available across all application templates
-- Called directly by function name
+- Imported into each `.gjs` file that uses them
+- Called by their imported identifier
 
 ```javascript
 // app/helpers/format-currency.js
@@ -883,16 +947,21 @@ export default function formatCurrency(amount, currency = 'USD') {
 }
 ```
 
-```handlebars
-<span>{{format-currency @item.modules.price 'EUR'}}</span>
+```gjs
+import formatCurrency from '../helpers/format-currency';
+
+<template>
+  <span>{{formatCurrency @item.modules.price "EUR"}}</span>
+</template>
 ```
 
 **Helper Features:**
 
 - Support positional arguments: `{{helper arg1 arg2}}`
 - Support named arguments: `{{helper arg1 key=value}}`
-- Can be nested: `{{outer-helper (inner-helper @value)}}`
+- Can be nested: `{{outerHelper (innerHelper @value)}}`
 - Built-in helpers available: `{{get}}`, `{{concat}}`, `{{let}}`, `{{array}}`, `{{hash}}`
+- Addon helpers are imported the same way, e.g. `import { eq, and, not } from 'ember-truth-helpers';`
 
 **Usage Guidelines:**
 
@@ -905,11 +974,13 @@ Ember components should be thought of as templates that re-execute from scratch 
 
 **Template Patterns:**
 
-```handlebars
-<article title='{{@article.modules.title}}'>
-  <header><h1>{{@article.modules.title}}</h1></header>
-  <section>{{@article.modules.body}}</section>
-</article>
+```gjs
+<template>
+  <article title={{@article.modules.title}}>
+    <header><h1>{{@article.modules.title}}</h1></header>
+    <section>{{@article.modules.body}}</section>
+  </article>
+</template>
 ```
 
 **Dynamic Updates:**
@@ -917,23 +988,22 @@ Ember components should be thought of as templates that re-execute from scratch 
 - Text and Attributes: Use `{{}}` syntax for automatic DOM updates
 - Conditional Logic: Use helpers for conditional attributes
 
-```handlebars
-<div class={{if @user.modules.is_admin 'superuser' 'standard'}}>
-  Welcome to my app.
-</div>
+```gjs
+<template>
+  <div class={{if @user.modules.is_admin "superuser" "standard"}}>
+    Welcome to my app.
+  </div>
+</template>
 ```
 
 **Event Handling:**
 Use `{{on}}` element modifier for event handlers:
 
-```handlebars
-<button type='button' {{on 'click' this.increment}}>+</button>
-```
-
-```javascript
+```gjs
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
+import { on } from '@ember/modifier';
 
 export default class CounterComponent extends Component {
   @tracked count = 0;
@@ -942,6 +1012,10 @@ export default class CounterComponent extends Component {
   increment() {
     this.count++;
   }
+
+  <template>
+    <button type="button" {{on "click" this.increment}}>+</button>
+  </template>
 }
 ```
 
@@ -955,24 +1029,37 @@ export default class CounterComponent extends Component {
 
 **Complex Interaction Example:**
 
-```handlebars
-<audio src={{@song.modules.src_url}} {{play-when this.isPlaying}} />
-<button type='button' {{on 'click' this.play}}>Play</button>
-<button type='button' {{on 'click' this.pause}}>Pause</button>
-```
+```gjs
+// app/components/song-player.gjs
+import Component from '@glimmer/component';
+import { action } from '@ember/object';
+import { tracked } from '@glimmer/tracking';
+import { on } from '@ember/modifier';
+import playWhen from '../modifiers/play-when';
 
-```javascript
-// Component manages state
-@tracked isPlaying = false;
+export default class SongPlayer extends Component {
+  @tracked isPlaying = false;
 
-@action
-play() {
-  this.isPlaying = true;
+  @action
+  play() {
+    this.isPlaying = true;
+  }
+
+  @action
+  pause() {
+    this.isPlaying = false;
+  }
+
+  <template>
+    <audio src={{@song.modules.src_url}} {{playWhen this.isPlaying}} />
+    <button type="button" {{on "click" this.play}}>Play</button>
+    <button type="button" {{on "click" this.pause}}>Pause</button>
+  </template>
 }
 ```
 
 ```javascript
-// Modifier handles DOM interaction
+// app/modifiers/play-when.js
 import { modifier } from 'ember-modifier';
 
 export default modifier((element, [isPlaying]) => {
@@ -987,10 +1074,15 @@ export default modifier((element, [isPlaying]) => {
 **Modifier Forwarding:**
 Modifiers applied to components pass through via `...attributes`:
 
-```handlebars
-<Tooltip {{custom-modifier}} />
-<!-- Forwards to: -->
-<div ...attributes>...</div>
+```gjs
+<template>
+  <Tooltip {{customModifier}} />
+</template>
+
+// Forwards to:
+<template>
+  <div ...attributes>...</div>
+</template>
 ```
 
 #### Services
@@ -1061,12 +1153,15 @@ export default class VisualizationBuilderService extends Service {
 
 #### Component Structure
 
-```javascript
-// Component class
+Each component is one `.gjs` file holding the class and its `<template>`:
+
+```gjs
+// app/components/file-card.gjs
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import { service } from '@ember/service';
+import { on } from '@ember/modifier';
 
 export default class FileCardComponent extends Component {
   @service store;
@@ -1076,21 +1171,28 @@ export default class FileCardComponent extends Component {
   toggleSelection() {
     this.isSelected = !this.isSelected;
   }
+
+  <template>
+    <div
+      class="card {{if this.isSelected 'border-primary'}}"
+      {{on "click" this.toggleSelection}}
+    >
+      <div class="card-body">
+        <h5 class="card-title">{{@file.modules.title}}</h5>
+        <p class="card-text">{{@file.modules.description}}</p>
+      </div>
+    </div>
+  </template>
 }
 ```
 
-#### Template Patterns
+Template-only components export a bare `<template>`:
 
-```handlebars
-<div
-  class='card {{if this.isSelected "border-primary"}}'
-  {{on 'click' this.toggleSelection}}
->
-  <div class='card-body'>
-    <h5 class='card-title'>{{@file.modules.title}}</h5>
-    <p class='card-text'>{{@file.modules.description}}</p>
-  </div>
-</div>
+```gjs
+// app/components/file-badge.gjs
+<template>
+  <span class="badge text-bg-secondary">{{@file.modules.content_privacy}}</span>
+</template>
 ```
 
 ---
@@ -1129,56 +1231,68 @@ async uploadFile(file) {
 
 #### Input and Textarea fields
 
-Use Ember's built-in `<Input>` component instead of a raw `<input>` tag — it automatically updates bound state via `@value`.
+Use Ember's built-in `<Input>` component instead of a raw `<input>` tag — it automatically updates bound state via `@value`. Import `Input` and `Textarea` from `@ember/component`.
 
-```handlebars
-<div class='mb-3'>
-  <label for='input-name' class='form-label'>Name:</label>
-  <Input
-    id='input-name'
-    class='form-control'
-    @type='text'
-    @value={{this.name}}
-    disabled={{this.isReadOnly}}
-    maxlength='50'
-    placeholder='Enter your name'
-  />
-</div>
-```
-
-```javascript
+```gjs
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
+import { Input } from '@ember/component';
 
 export default class ExampleComponent extends Component {
   @tracked name = '';
   @tracked isReadOnly = false;
+
+  <template>
+    <div class="mb-3">
+      <label for="input-name" class="form-label">Name:</label>
+      <Input
+        id="input-name"
+        class="form-control"
+        @type="text"
+        @value={{this.name}}
+        disabled={{this.isReadOnly}}
+        maxlength="50"
+        placeholder="Enter your name"
+      />
+    </div>
+  </template>
 }
 ```
 
-```handlebars
-<div class='form-check mb-3'>
-  <Input
-    id='admin-checkbox'
-    class='form-check-input'
-    @type='checkbox'
-    @checked={{this.isAdmin}}
-    {{on 'input' this.validateRole}}
-  />
-  <label for='admin-checkbox' class='form-check-label'>Is Admin?</label>
-</div>
+The shorter examples below show only the imports and the `<template>` block. Place them inside a class-backed component that defines the referenced `this.*` properties.
+
+```gjs
+import { Input } from '@ember/component';
+import { on } from '@ember/modifier';
+
+<template>
+  <div class="form-check mb-3">
+    <Input
+      id="admin-checkbox"
+      class="form-check-input"
+      @type="checkbox"
+      @checked={{this.isAdmin}}
+      {{on "input" this.validateRole}}
+    />
+    <label for="admin-checkbox" class="form-check-label">Is Admin?</label>
+  </div>
+</template>
 ```
 
-```handlebars
-<div class='mb-3'>
-  <label for='user-comment' class='form-label'>Comment:</label>
-  <Textarea
-    id='user-comment'
-    class='form-control'
-    @value={{this.userComment}}
-    rows='6'
-  />
-</div>
+```gjs
+import { Textarea } from '@ember/component';
+
+<template>
+  <div class="mb-3">
+    <label for="user-comment" class="form-label">Comment:</label>
+    <Textarea
+      id="user-comment"
+      class="form-control"
+      @value={{this.userComment}}
+      rows="6"
+    />
+  </div>
+</template>
 ```
 
 **Key rules for `<Input>` and `<Textarea>`:**
@@ -1193,27 +1307,11 @@ export default class ExampleComponent extends Component {
 
 **Single select (Bootstrap-compatible wrapper):**
 
-```handlebars
-<div class='mb-3'>
-  <label class='form-label'>Assign Category:</label>
-  <div class='form-control p-0 border-0'>
-    <PowerSelect
-      @options={{this.categories}}
-      @selected={{this.selectedCategory}}
-      @onChange={{this.handleCategoryChange}}
-      @placeholder='Select a category'
-      as |category|
-    >
-      {{category.name}}
-    </PowerSelect>
-  </div>
-</div>
-```
-
-```javascript
+```gjs
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
+import PowerSelect from 'ember-power-select/components/power-select';
 
 export default class ExampleComponent extends Component {
   @tracked selectedCategory = null;
@@ -1228,46 +1326,71 @@ export default class ExampleComponent extends Component {
   handleCategoryChange(category) {
     this.selectedCategory = category;
   }
+
+  <template>
+    <div class="mb-3">
+      <label class="form-label">Assign Category:</label>
+      <div class="form-control p-0 border-0">
+        <PowerSelect
+          @options={{this.categories}}
+          @selected={{this.selectedCategory}}
+          @onChange={{this.handleCategoryChange}}
+          @placeholder="Select a category"
+          as |category|
+        >
+          {{category.name}}
+        </PowerSelect>
+      </div>
+    </div>
+  </template>
 }
 ```
 
-**Multi-select variant:**
+**Multi-select variant** (template block of a class-backed component):
 
-```handlebars
-<div class='mb-3'>
-  <label class='form-label'>Assign Tags:</label>
-  <div class='form-control p-0 border-0'>
-    <PowerSelectMultiple
-      @options={{this.availableTags}}
-      @selected={{this.selectedTags}}
-      @onChange={{this.handleTagsChange}}
-      @placeholder='Select tags'
-      as |tag|
-    >
-      {{tag.label}}
-    </PowerSelectMultiple>
+```gjs
+import PowerSelectMultiple from 'ember-power-select/components/power-select-multiple';
+
+<template>
+  <div class="mb-3">
+    <label class="form-label">Assign Tags:</label>
+    <div class="form-control p-0 border-0">
+      <PowerSelectMultiple
+        @options={{this.availableTags}}
+        @selected={{this.selectedTags}}
+        @onChange={{this.handleTagsChange}}
+        @placeholder="Select tags"
+        as |tag|
+      >
+        {{tag.label}}
+      </PowerSelectMultiple>
+    </div>
   </div>
-</div>
+</template>
 ```
 
-**Async options loaded from the store:**
+**Async options loaded from the store** (template block of a class-backed component):
 
-```handlebars
-<div class='mb-3'>
-  <label class='form-label'>Select Project:</label>
-  <div class='form-control p-0 border-0'>
-    <PowerSelect
-      @options={{this.projects}}
-      @selected={{this.selectedProject}}
-      @onChange={{this.handleProjectChange}}
-      @searchField='name'
-      @placeholder='Search projects...'
-      as |project|
-    >
-      {{project.modules.name}}
-    </PowerSelect>
+```gjs
+import PowerSelect from 'ember-power-select/components/power-select';
+
+<template>
+  <div class="mb-3">
+    <label class="form-label">Select Project:</label>
+    <div class="form-control p-0 border-0">
+      <PowerSelect
+        @options={{this.projects}}
+        @selected={{this.selectedProject}}
+        @onChange={{this.handleProjectChange}}
+        @searchField="name"
+        @placeholder="Search projects..."
+        as |project|
+      >
+        {{project.modules.name}}
+      </PowerSelect>
+    </div>
   </div>
-</div>
+</template>
 ```
 
 **Key rules for `<PowerSelect>`:**
@@ -1278,16 +1401,30 @@ export default class ExampleComponent extends Component {
 
 ---
 
+### Rendering Editor.js Content
+
+Fields saved by Editor.js hold JSON with a `blocks` array. The preinstalled `editorjs` component renders `paragraph`, `header`, `list`, `table`, `quote`, `image` and `raw` blocks with Bootstrap classes:
+
+```gjs
+import Editorjs from '../components/editorjs';
+
+<template>
+  <Editorjs @jsondata={{@model.modules.content}} />
+</template>
+```
+
+---
+
 ### Deploying to Junction (Self-Hosted)
 
 After building your Ember app, run `php-dist` to prepare the `dist/` folder for PHP middleware:
 
 ```bash
-ember build -prod
+vite build
 node php-dist
 ```
 
-This reads `dist/index.html`, injects PHP includes (`_init.php`, `_head.php`, `_head_footer.php`, `_body_footer.php`), strips `<title>` and `<meta name="description">`, and writes `dist/index.php`.
+This reads `dist/index.html`, injects PHP includes (`_init.php`, `_head.php`, `_head_footer.php`, `_body_footer.php`), strips `<title>` and `<meta name="description">`, and writes `dist/index.php`. The PHP files come from `public/`, and `public/composer.json` declares their dependencies (`tribe/core`, `vlucas/phpdotenv` and others).
 
 You can then upload the `dist/` folder to [Junction (open source)](http://localhost:12002) and view your app at **http://localhost:12004**.
 

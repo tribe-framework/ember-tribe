@@ -4,9 +4,9 @@
 /**
  * storylang — single-file edition
  *
- * Usage: node tribe storylang
+ * Usage: node storylang
  *
- * Scans the current Ember project and writes/updates config/storylang.json
+ * Scans the current Ember project and writes/updates public/storylang.json
  * from the actual files that exist in the app/ directory.
  */
 
@@ -908,13 +908,49 @@ function stripEmpty(obj) {
   return obj;
 }
 
+const PAIR_KEYS = new Set(["tracked_vars", "get_vars", "inherited_args", "args"]);
+const KEEP_EXISTING_KEYS = new Set(["return"]);
+
+function mergePairs(existingPairs, scannedPairs) {
+  if (!Array.isArray(existingPairs)) return scannedPairs;
+  const existingTypes = new Map();
+  for (const pair of existingPairs) {
+    if (pair && typeof pair === "object" && !Array.isArray(pair)) {
+      for (const [k, v] of Object.entries(pair)) existingTypes.set(k, v);
+    }
+  }
+  return scannedPairs.map((pair) => {
+    const [k, v] = Object.entries(pair)[0];
+    return { [k]: existingTypes.has(k) ? existingTypes.get(k) : v };
+  });
+}
+
+function mergeEntry(existingEntry, scannedEntry, key) {
+  const merged = { [key]: scannedEntry[key] };
+  for (const [k, v] of Object.entries(existingEntry || {})) {
+    if (k === key || k === "name" || k in scannedEntry) continue;
+    merged[k] = v;
+  }
+  for (const [k, v] of Object.entries(scannedEntry)) {
+    if (k === key) continue;
+    if (PAIR_KEYS.has(k) && Array.isArray(v)) {
+      merged[k] = mergePairs(existingEntry && existingEntry[k], v);
+    } else if (
+      KEEP_EXISTING_KEYS.has(k) &&
+      existingEntry &&
+      existingEntry[k] !== undefined
+    ) {
+      merged[k] = existingEntry[k];
+    } else {
+      merged[k] = v;
+    }
+  }
+  return merged;
+}
+
 function mergeByKey(existing, scanned, key) {
-  // Support migrating from old 'name'-keyed entries to new 'slug'-keyed entries.
-  // If an existing entry has no 'slug' but has a 'name', treat 'name' as the key.
   const existingMap = new Map(existing.map((e) => [e[key] ?? e["name"], e]));
-  const scannedMap = new Map(scanned.map((s) => [s[key], s]));
-  const allKeys = new Set([...existingMap.keys(), ...scannedMap.keys()]);
-  return [...allKeys].map((k) => ({ ...(scannedMap.get(k) || {}) }));
+  return scanned.map((s) => mergeEntry(existingMap.get(s[key]), s, key));
 }
 
 (async () => {

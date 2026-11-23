@@ -117,7 +117,7 @@ function removeTags(html, tagName, predicate) {
 
   if (!fs.existsSync(inputFile)) {
     console.log(hr);
-    console.log(red('Run "ember build -prod" before syncing with PHP.'));
+    console.log(red('Run "vite build" before syncing with PHP.'));
     console.log(hr);
     process.exit(1);
   }
