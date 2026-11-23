@@ -1,7 +1,6 @@
 import Route from '@ember/routing/route';
-import * as bootstrap from 'bootstrap';
+import 'bootstrap';
 import { service } from '@ember/service';
-import { later } from '@ember/runloop';
 import { action } from '@ember/object';
 
 export default class ApplicationRoute extends Route {
@@ -13,13 +12,9 @@ export default class ApplicationRoute extends Route {
 
   @action
   didTransition() {
-    later(
-      this,
-      () => {
-        document.querySelector('#loading').classList.add('d-none');
-      },
-      50,
-    );
+    setTimeout(() => {
+      document.querySelector('#loading').classList.add('d-none');
+    }, 50);
   }
 
   @action

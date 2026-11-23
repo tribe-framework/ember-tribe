@@ -1,6 +1,7 @@
-import StoryLangIndex from '<%= dasherizedPackageName %>/components/storylang/index';
+import StorylangIndex from '../components/storylang/index';
 
 <template>
-  <StoryLangIndex />
+  <StorylangIndex />
+
   {{outlet}}
 </template>

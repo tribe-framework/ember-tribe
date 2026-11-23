@@ -43,7 +43,13 @@ export default [
    * https://eslint.org/docs/latest/use/configure/ignore
    */
   {
-    ignores: ['dist/', 'node_modules/', 'coverage/', '!**/.*'],
+    ignores: [
+      'dist/',
+      'node_modules/',
+      'coverage/',
+      'blueprints/*/files/',
+      '!**/.*',
+    ],
   },
   /**
    * https://eslint.org/docs/latest/use/configure/configuration-files#configuring-linter-options
@@ -87,6 +93,7 @@ export default [
       'testem.js',
       'testem*.js',
       'index.js',
+      'blueprints/*/index.js',
       '.prettierrc.js',
       '.stylelintrc.js',
       '.template-lintrc.js',
